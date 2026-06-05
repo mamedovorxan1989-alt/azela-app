@@ -7,8 +7,9 @@
 <style>
 *{box-sizing:border-box;margin:0;padding:0;}
 body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;background:#0a0015;color:#f0e6ff;min-height:100vh;}
-.hero{display:flex;flex-direction:column;align-items:center;justify-content:center;min-height:100vh;padding:48px 20px;text-align:center;}
-.logo{font-family:Georgia,serif;font-size:72px;font-weight:700;color:#fff;letter-spacing:0.15em;margin-bottom:48px;}
+.hero{display:flex;flex-direction:column;align-items:center;justify-content:center;min-height:100vh;padding:64px 20px 48px;text-align:center;}
+.logo{font-family:Georgia,serif;font-size:72px;font-weight:700;color:#fff;letter-spacing:0.15em;margin-bottom:12px;}
+.tagline{font-size:16px;color:#a78bfa;margin-bottom:52px;letter-spacing:.02em;}
 
 .cards{display:flex;gap:24px;justify-content:center;align-items:stretch;width:100%;max-width:720px;margin-bottom:32px;}
 .card{flex:1;display:flex;flex-direction:column;border-radius:20px;padding:28px 26px 24px;text-align:left;}
@@ -33,19 +34,38 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;backgrou
 .btn:hover{opacity:.85;}
 
 .ver{font-size:12px;color:#6b4fa0;text-align:center;}
-
 .req{font-size:12px;color:#4c1d95;background:rgba(124,58,237,0.1);padding:8px 20px;border-radius:20px;display:inline-block;}
-.footer{margin-top:48px;font-size:12px;color:#3d1a6e;}
 
-@media(max-width:600px){
+/* Features section */
+.features{width:100%;max-width:800px;margin:64px auto 0;}
+.features-title{font-size:13px;font-weight:700;letter-spacing:.12em;text-transform:uppercase;color:#6b4fa0;margin-bottom:32px;}
+.feat-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:16px;margin-bottom:48px;}
+.feat-item{background:rgba(139,92,246,0.07);border:1px solid rgba(139,92,246,0.18);border-radius:14px;padding:20px 18px;}
+.feat-icon{font-size:22px;margin-bottom:10px;}
+.feat-name{font-size:13px;font-weight:700;color:#e2d9f3;margin-bottom:6px;}
+.feat-text{font-size:12px;color:#7c5fb5;line-height:1.6;}
+
+.divider{width:1px;height:40px;background:rgba(139,92,246,0.2);margin:0 auto 48px;}
+
+.about{max-width:600px;margin:0 auto 64px;font-size:14px;color:#7c5fb5;line-height:1.9;text-align:center;}
+.about b{color:#c4b5fd;}
+
+.footer{font-size:12px;color:#3d1a6e;padding-bottom:32px;}
+
+@media(max-width:700px){
+  .feat-grid{grid-template-columns:repeat(2,1fr);}
   .cards{flex-direction:column;max-width:360px;}
-  .logo{font-size:52px;margin-bottom:36px;}
+  .logo{font-size:52px;margin-bottom:10px;}
+}
+@media(max-width:440px){
+  .feat-grid{grid-template-columns:1fr;}
 }
 </style>
 </head>
 <body>
 <div class="hero">
   <div class="logo">AZELA</div>
+  <div class="tagline">Kiçik və orta biznes üçün anbar, satış və müştəri idarəetmə sistemi</div>
 
   <div class="cards">
     <div class="card pro">
@@ -82,6 +102,66 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;backgrou
   </div>
 
   <div class="req">Windows 10 / 11 · 64-bit</div>
+
+  <!-- Features -->
+  <div class="features">
+    <div class="features-title">Nə edə bilərsiniz</div>
+
+    <div class="feat-grid">
+      <div class="feat-item">
+        <div class="feat-icon">🧾</div>
+        <div class="feat-name">Alış Qaimələri</div>
+        <div class="feat-text">Alış qaimələrini daxil edin, stok avtomatik yenilənsin. Tarixçə, axtarış, silmə.</div>
+      </div>
+      <div class="feat-item">
+        <div class="feat-icon">💰</div>
+        <div class="feat-name">Satış və Kassa</div>
+        <div class="feat-text">Sürətli satış, nisyə, nağd, kartla ödəniş. Kassa pəncərəsi ayrıca açılır.</div>
+      </div>
+      <div class="feat-item">
+        <div class="feat-icon">👥</div>
+        <div class="feat-name">Müştəri İdarəetməsi</div>
+        <div class="feat-text">Hər müştərinin borcu, alış tarixçəsi, ödəniş qeydləri. Borca görə sıralama.</div>
+      </div>
+      <div class="feat-item">
+        <div class="feat-icon">📦</div>
+        <div class="feat-name">Anbar və Stok</div>
+        <div class="feat-text">Məhsul qalığı, giriş-çıxış hərəkəti, stok xəbərdarlığı. Mal tarifləri siyahısı.</div>
+      </div>
+      <div class="feat-item">
+        <div class="feat-icon">📊</div>
+        <div class="feat-name">Qazanc Hesabatları</div>
+        <div class="feat-text">Mala görə, müştəriyə görə, satışa görə xalis qazanc. Marja, medal sistemi.</div>
+      </div>
+      <div class="feat-item">
+        <div class="feat-icon">🔄</div>
+        <div class="feat-name">İadə və Əvəz</div>
+        <div class="feat-text">Mal iadəsi və əvəz satışları ayrıca izlənir, hesabatlara düzgün əks olunur.</div>
+      </div>
+      <div class="feat-item">
+        <div class="feat-icon">🏢</div>
+        <div class="feat-name">Şirkət Bölməsi</div>
+        <div class="feat-text">Şirkət xərcləri, gəlirləri və ümumi maliyyə vəziyyəti bir yerdə.</div>
+      </div>
+      <div class="feat-item">
+        <div class="feat-icon">📱</div>
+        <div class="feat-name">Müştəri Tətbiqi</div>
+        <div class="feat-text">Müştəri Android telefondan öz borcunu, alışlarını və məhsul qiymətlərini görür.</div>
+      </div>
+      <div class="feat-item">
+        <div class="feat-icon">💾</div>
+        <div class="feat-name">Offline · Yerli Data</div>
+        <div class="feat-text">İnternet olmadan işləyir. Bütün məlumat kompüterinizdə saxlanılır, avtomatik yedəklənir.</div>
+      </div>
+    </div>
+
+    <div class="divider"></div>
+
+    <div class="about">
+      <b>AZELA Pro</b> — ticarət, anbar və müştəri idarəetməsini bir yerdə birləşdirən <b>Windows masa üstü proqramı</b>dır. Alış qaimələrindən satışa, stok hərəkətindən qazanc hesabatına qədər bütün iş axını tək proqramda həll olunur. <b>Kassa pəncərəsi</b> paralel açılır, eyni anda həm idarəetmə həm də satış mümkündür. Məlumatlar yalnız sizin kompüterinizdə saxlanılır — internet asılılığı yoxdur.
+    </div>
+  </div>
+
   <div class="footer">© 2026 AZELA. Bütün hüquqlar qorunur.</div>
 </div>
 </body>
