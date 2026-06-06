@@ -1,0 +1,837 @@
+<!DOCTYPE html>
+<html lang="az">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+<title>AZELA — Müştəri</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0;}
+body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;background:#f1f5f9;min-height:100vh;display:flex;justify-content:center;}
+.phone{width:100%;max-width:400px;min-height:100vh;background:#f1f5f9;position:relative;overflow:hidden;}
+#screenLogin{display:flex;flex-direction:column;align-items:center;justify-content:center;min-height:100vh;padding:40px 24px;background:linear-gradient(160deg,#0f0025 0%,#1e0050 60%,#2d0080 100%);}
+.login-logo{font-family:Georgia,serif;font-size:52px;font-weight:700;color:#fff;letter-spacing:0.15em;margin-bottom:6px;}
+.login-sub{font-size:14px;color:#a78bfa;margin-bottom:60px;letter-spacing:1px;}
+.login-card{width:100%;background:rgba(255,255,255,0.07);border:1px solid rgba(255,255,255,0.12);border-radius:24px;padding:28px 24px;text-align:center;}
+.login-title{font-size:18px;font-weight:700;color:#fff;margin-bottom:6px;}
+.login-desc{font-size:13px;color:#a78bfa;margin-bottom:28px;line-height:1.5;}
+.btn-google{display:flex;align-items:center;justify-content:center;gap:10px;width:100%;padding:14px;border-radius:14px;background:#fff;border:none;font-size:15px;font-weight:600;color:#1e293b;cursor:pointer;}
+.btn-google svg{width:20px;height:20px;flex-shrink:0;}
+.login-footer{margin-top:24px;font-size:11.5px;color:#6b4fa0;text-align:center;}
+#screenApp{display:none;flex-direction:column;min-height:100vh;}
+.topbar{background:linear-gradient(135deg,#1e0050,#3b0098);padding:14px 20px 16px;}
+.topbar-row{display:flex;align-items:center;justify-content:space-between;margin-bottom:10px;}
+.topbar-logo{font-family:Georgia,serif;font-size:20px;font-weight:700;color:#fff;letter-spacing:0.12em;}
+.topbar-avatar{width:36px;height:36px;border-radius:50%;background:linear-gradient(135deg,#8b5cf6,#6d28d9);display:flex;align-items:center;justify-content:center;font-size:14px;font-weight:700;color:#fff;border:2px solid rgba(255,255,255,0.3);}
+.topbar-name{font-size:15px;font-weight:700;color:#fff;margin-bottom:2px;}
+.topbar-debt-row{display:flex;align-items:center;justify-content:space-between;margin-top:4px;}
+.topbar-email{font-size:12px;color:#c4b5fd;}
+.topbar-cari{font-size:11px;color:#a78bfa;}
+.topbar-cari-val{font-size:17px;font-weight:800;}
+.topbar-cari-val.red{color:#fca5a5;} .topbar-cari-val.green{color:#86efac;}
+.tabs{display:flex;margin:14px 16px 0;background:#fff;border-radius:14px;padding:4px;box-shadow:0 1px 4px rgba(0,0,0,0.08);overflow:hidden;}
+.tab{flex:1;padding:8px 2px;border-radius:10px;border:none;background:none;font-size:11.5px;font-weight:600;color:#94a3b8;cursor:pointer;transition:all .15s;white-space:nowrap;}
+.tab.active{background:linear-gradient(135deg,#7c3aed,#6d28d9);color:#fff;box-shadow:0 2px 8px rgba(124,58,237,0.35);}
+.content{flex:1;padding:0 0 24px;overflow-y:auto;}
+.tab-panel{display:none;} .tab-panel.active{display:block;}
+.bonus-card{margin:20px 16px;background:linear-gradient(135deg,#fef9c3,#fef3c7);border:2px solid #fde047;border-radius:20px;padding:28px 20px;text-align:center}
+.bonus-star{font-size:52px;margin-bottom:10px}
+.bonus-lbl{font-size:12px;font-weight:700;color:#92400e;text-transform:uppercase;letter-spacing:.6px;margin-bottom:8px}
+.bonus-val{font-size:42px;font-weight:800;color:#d97706;margin-bottom:14px;font-variant-numeric:tabular-nums}
+.bonus-desc{font-size:12px;color:#78350f;line-height:1.6}
+
+/* ── STAT KARTLARI ── */
+.stats-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:10px;padding:14px 16px 4px;}
+.stat-card{background:#fff;border-radius:16px;padding:13px 14px;box-shadow:0 1px 4px rgba(0,0,0,.07);}
+.stat-lbl{font-size:10.5px;font-weight:700;color:#94a3b8;text-transform:uppercase;letter-spacing:.4px;margin-bottom:5px;}
+.stat-val{font-size:20px;font-weight:800;color:#1e293b;}
+.stat-val.accent{color:#6366f1;} .stat-val.green{color:#16a34a;} .stat-val.red{color:#dc2626;}
+
+/* ── FILTER ── */
+.filter-bar{display:flex;gap:6px;overflow-x:auto;padding:10px 16px 12px;scrollbar-width:none;}
+.filter-bar::-webkit-scrollbar{display:none;}
+.filter-btn{flex-shrink:0;padding:7px 16px;border-radius:20px;border:none;font-size:13px;font-weight:600;cursor:pointer;font-family:inherit;transition:all .15s;}
+.filter-btn.active{background:#7c3aed;color:#fff;box-shadow:0 2px 8px rgba(124,58,237,.3);}
+.filter-btn:not(.active){background:#e2e8f0;color:#475569;}
+
+/* ── QRAFİK ── */
+.chart-card{background:#fff;border-radius:16px;margin:0 16px 12px;padding:14px 14px 10px;box-shadow:0 1px 4px rgba(0,0,0,.07);}
+.chart-title{font-size:11px;font-weight:700;color:#94a3b8;text-transform:uppercase;letter-spacing:.5px;margin-bottom:12px;}
+.chart-empty{text-align:center;padding:20px;color:#94a3b8;font-size:13px;}
+.pie-wrap{display:flex;align-items:center;gap:14px;}
+.pie-legend{flex:1;font-size:11.5px;}
+.pie-legend-row{display:flex;align-items:center;gap:6px;margin-bottom:5px;}
+.pie-dot{width:10px;height:10px;border-radius:3px;flex-shrink:0;}
+.pie-lbl{font-size:12px;font-weight:700;color:#1e293b;}
+.pie-sub{font-size:10.5px;color:#94a3b8;}
+
+/* ── ALISLAR ── */
+.section-title{font-size:12px;font-weight:700;color:#94a3b8;text-transform:uppercase;letter-spacing:.5px;margin:14px 16px 8px;}
+.purch-card{background:#fff;border-radius:16px;padding:12px 14px;margin:0 16px 8px;box-shadow:0 1px 4px rgba(0,0,0,0.06);}
+.purch-head{display:flex;align-items:center;justify-content:space-between;margin-bottom:6px;}
+.purch-date{font-size:12px;color:#94a3b8;}
+.purch-badge{font-size:11px;font-weight:700;padding:3px 9px;border-radius:20px;}
+.purch-badge.nagd{background:#dcfce7;color:#15803d;} .purch-badge.nisye{background:#fee2e2;color:#b91c1c;}
+.purch-badge.qismen{background:#ffedd5;color:#c2410c;} .purch-badge.evaz{background:#ede9fe;color:#6d28d9;}
+.purch-badge.qaytarma{background:#ccfbf1;color:#0f766e;}
+.purch-item{display:flex;justify-content:space-between;align-items:center;padding:3px 0;}
+.purch-item-name{font-size:13px;font-weight:600;color:#1e293b;}
+.purch-item-qty{font-size:12px;color:#64748b;}
+.purch-total{display:flex;justify-content:space-between;border-top:1px solid #f1f5f9;padding-top:6px;margin-top:3px;}
+
+/* ── ÖDƏNİŞ ── */
+.pay-card{background:#fff;border-radius:14px;padding:12px 14px;margin:0 16px 8px;box-shadow:0 1px 4px rgba(0,0,0,0.06);}
+
+/* ── MƏHSULLAR ── */
+.prod-search-wrap{position:relative;margin:8px 16px 10px;}
+.prod-search{width:100%;padding:11px 14px 11px 40px;border:1.5px solid #e2e8f0;border-radius:12px;font-size:14px;background:#fff;color:#1e293b;outline:none;transition:border-color .15s;box-sizing:border-box;}
+.prod-search:focus{border-color:#94a3b8;}
+.prod-search-ico{position:absolute;left:12px;top:50%;transform:translateY(-50%);pointer-events:none;display:flex;align-items:center;}
+.prod-card{background:#fff;border-radius:14px;padding:12px 14px;margin:0 16px 8px;box-shadow:0 1px 4px rgba(0,0,0,0.06);display:flex;align-items:center;gap:8px;}
+.prod-info{flex:1;} .prod-name{font-size:14px;font-weight:700;color:#1e293b;margin-bottom:2px;}
+.prod-code{font-size:11.5px;color:#94a3b8;}
+.empty{text-align:center;padding:40px 20px;color:#94a3b8;font-size:14px;}
+
+/* ── PROFİL ── */
+#screenProfile{position:absolute;inset:0;z-index:50;background:#f1f5f9;display:none;flex-direction:column;overflow-y:auto;}
+.prof-topbar{background:linear-gradient(135deg,#1e0050,#3b0098);padding:16px 20px 28px;}
+.prof-back{display:flex;align-items:center;gap:6px;color:#c4b5fd;font-size:14px;font-weight:600;cursor:pointer;margin-bottom:20px;}
+.prof-back svg{width:18px;height:18px;}
+.prof-avatar{width:76px;height:76px;border-radius:50%;background:linear-gradient(135deg,#8b5cf6,#6d28d9);display:flex;align-items:center;justify-content:center;font-size:30px;font-weight:700;color:#fff;border:3px solid rgba(255,255,255,0.3);margin:0 auto 12px;}
+.prof-body{padding:20px;}
+.prof-card{background:#fff;border-radius:16px;padding:4px 16px;box-shadow:0 1px 4px rgba(0,0,0,0.06);margin-bottom:16px;}
+.prof-row{display:flex;align-items:center;gap:12px;padding:14px 0;border-bottom:1px solid #f8fafc;}
+.prof-row:last-child{border-bottom:none;}
+.prof-row-ico{width:36px;height:36px;border-radius:10px;background:#f1f5f9;display:flex;align-items:center;justify-content:center;font-size:16px;flex-shrink:0;}
+.prof-row-lbl{font-size:11.5px;color:#94a3b8;margin-bottom:2px;} .prof-row-val{font-size:14px;font-weight:600;color:#1e293b;}
+.btn-logout{display:flex;align-items:center;justify-content:center;gap:8px;width:100%;padding:15px;border-radius:14px;background:#fee2e2;border:none;font-size:15px;font-weight:700;color:#b91c1c;cursor:pointer;}
+</style>
+</head>
+<body>
+<div class="phone">
+
+<!-- SETUP -->
+<div id="screenSetup" style="display:none;flex-direction:column;align-items:center;justify-content:center;min-height:100vh;padding:40px 24px;background:linear-gradient(160deg,#0f0025 0%,#1e0050 60%,#2d0080 100%);">
+  <div class="login-logo">AZELA</div><div class="login-sub">MÜŞTƏRİ PANELİ</div>
+  <div class="login-card">
+    <div class="login-title">Quraşdırma</div>
+    <div class="login-desc" style="margin-bottom:20px">Admindən aldığınız iki kodu daxil edin</div>
+    <div style="font-size:11px;font-weight:700;color:#a78bfa;text-transform:uppercase;letter-spacing:.5px;margin-bottom:6px;text-align:left">Kod 1 (Server)</div>
+    <input id="setupCode1" type="text" placeholder="https://xxx.supabase.co"
+      style="width:100%;padding:13px 14px;border-radius:12px;border:1.5px solid rgba(255,255,255,0.2);background:rgba(255,255,255,0.1);color:#fff;font-size:13px;font-family:monospace;outline:none;margin-bottom:12px;box-sizing:border-box"
+      onfocus="this.style.borderColor='#a78bfa'" onblur="this.style.borderColor='rgba(255,255,255,0.2)'">
+    <div style="font-size:11px;font-weight:700;color:#a78bfa;text-transform:uppercase;letter-spacing:.5px;margin-bottom:6px;text-align:left">Kod 2 (Açar)</div>
+    <input id="setupCode2" type="text" placeholder="eyJhbGci..."
+      style="width:100%;padding:13px 14px;border-radius:12px;border:1.5px solid rgba(255,255,255,0.2);background:rgba(255,255,255,0.1);color:#fff;font-size:13px;font-family:monospace;outline:none;margin-bottom:12px;box-sizing:border-box"
+      onfocus="this.style.borderColor='#a78bfa'" onblur="this.style.borderColor='rgba(255,255,255,0.2)'">
+    <div id="setupErr" style="font-size:12px;color:#f87171;margin-bottom:10px;min-height:18px;text-align:center"></div>
+    <button onclick="doSetup()" style="width:100%;padding:14px;border-radius:14px;background:linear-gradient(135deg,#7c3aed,#6d28d9);border:none;font-size:15px;font-weight:700;color:#fff;cursor:pointer;font-family:inherit">Quraşdır</button>
+  </div>
+</div>
+
+<!-- LOGIN -->
+<div id="screenLogin">
+  <div class="login-logo">AZELA</div><div class="login-sub">MÜŞTƏRİ PANELİ</div>
+  <div class="login-card">
+    <div class="login-title">Xoş gəldiniz</div>
+    <div class="login-desc">Gmail ünvanınızı daxil edin</div>
+    <input id="loginEmail" type="email" placeholder="sizin@gmail.com"
+      style="width:100%;padding:13px 14px;border-radius:12px;border:1.5px solid rgba(255,255,255,0.2);background:rgba(255,255,255,0.1);color:#fff;font-size:14px;font-family:inherit;outline:none;margin-bottom:12px;box-sizing:border-box"
+      onkeydown="if(event.key==='Enter')doLogin()"
+      onfocus="this.style.borderColor='#a78bfa'" onblur="this.style.borderColor='rgba(255,255,255,0.2)'">
+    <div id="loginErr" style="font-size:12px;color:#f87171;margin-bottom:10px;min-height:18px;text-align:center"></div>
+    <button class="btn-google" onclick="doLogin()" id="loginBtn">
+      <svg viewBox="0 0 48 48"><path fill="#EA4335" d="M24 9.5c3.54 0 6.71 1.22 9.21 3.6l6.85-6.85C35.9 2.38 30.47 0 24 0 14.62 0 6.51 5.38 2.56 13.22l7.98 6.19C12.43 13.72 17.74 9.5 24 9.5z"/><path fill="#4285F4" d="M46.98 24.55c0-1.57-.15-3.09-.38-4.55H24v9.02h12.94c-.58 2.96-2.26 5.48-4.78 7.18l7.73 6c4.51-4.18 7.09-10.36 7.09-17.65z"/><path fill="#FBBC05" d="M10.53 28.59c-.48-1.45-.76-2.99-.76-4.59s.27-3.14.76-4.59l-7.98-6.19C.92 16.46 0 20.12 0 24c0 3.88.92 7.54 2.56 10.78l7.97-6.19z"/><path fill="#34A853" d="M24 48c6.48 0 11.93-2.13 15.89-5.81l-7.73-6c-2.18 1.48-4.97 2.31-8.16 2.31-6.26 0-11.57-4.22-13.47-9.91l-7.98 6.19C6.51 42.62 14.62 48 24 48z"/><path fill="none" d="M0 0h48v48H0z"/></svg>
+      Daxil ol
+    </button>
+    <div class="login-footer">Yalnız admin tərəfindən əlavə edilmiş Gmail ilə giriş mümkündür</div>
+  </div>
+  <div style="margin-top:20px;text-align:center">
+    <button onclick="resetSetup()" style="background:none;border:none;color:rgba(255,255,255,0.25);font-size:11px;cursor:pointer;padding:4px 8px;font-family:inherit">⚙ Ayarları sıfırla</button>
+  </div>
+  <div style="margin-top:8px;text-align:center;color:rgba(255,255,255,0.15);font-size:10px">v2.3.1</div>
+</div>
+
+<!-- APP -->
+<div id="screenApp">
+  <div class="topbar">
+    <div class="topbar-row">
+      <div class="topbar-logo">AZELA</div>
+      <div style="display:flex;align-items:center;gap:10px">
+        <button onclick="refreshData()" id="refreshBtn"
+          style="background:rgba(255,255,255,0.15);border:none;border-radius:20px;color:#fff;font-size:11px;padding:5px 10px;cursor:pointer;font-family:inherit;font-weight:600">↻ Yenilə</button>
+        <div class="topbar-avatar" id="avatarInit" onclick="openProfile()" style="cursor:pointer">?</div>
+      </div>
+    </div>
+    <div class="topbar-name" id="custName">—</div>
+    <div class="topbar-debt-row">
+      <div class="topbar-email" id="custEmail">—</div>
+      <div style="text-align:right">
+        <div class="topbar-cari">cari borc</div>
+        <div class="topbar-cari-val green" id="topbarDebt">0.00 ₼</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- TABS -->
+  <div class="tabs">
+    <button class="tab active" id="tabBtn-prods"  onclick="switchTab('prods',this)">Məhsullar</button>
+    <button class="tab"        id="tabBtn-ops"    onclick="switchTab('ops',this)">Əməliyyat</button>
+    <button class="tab"        id="tabBtn-purch"  onclick="switchTab('purch',this)">Alışlar</button>
+    <button class="tab"        id="tabBtn-pay"    onclick="switchTab('pay',this)">Ödənişlər</button>
+    <button class="tab"        id="tabBtn-bonus"  onclick="switchTab('bonus',this)">⭐ Bonus</button>
+  </div>
+
+  <div class="content">
+
+    <!-- ── MƏHSULLAR (default) ── -->
+    <div class="tab-panel active" id="tab-prods">
+      <div class="section-title">Stokdakı məhsullar</div>
+      <div class="prod-search-wrap">
+        <span class="prod-search-ico"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#94a3b8" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="7"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg></span>
+        <input class="prod-search" id="prodSearch" type="text" placeholder="Məhsul axtar..." oninput="filterProds()">
+      </div>
+      <div id="prodList"><div class="empty" style="padding:32px 20px;color:#94a3b8">Məhsul adı yazın...</div></div>
+    </div>
+
+    <!-- ── ƏMƏLIYYATLAR ── -->
+    <div class="tab-panel" id="tab-ops">
+      <!-- 4 stat kart -->
+      <div class="stats-grid">
+        <div class="stat-card"><div class="stat-lbl">Cəmi satış</div><div class="stat-val accent" id="scCount">0</div></div>
+        <div class="stat-card"><div class="stat-lbl">Satış məbləği</div><div class="stat-val" id="scSell">0.00 ₼</div></div>
+        <div class="stat-card"><div class="stat-lbl">Ödənilən</div><div class="stat-val green" id="scPaid">0.00 ₼</div></div>
+        <div class="stat-card"><div class="stat-lbl">Borc qalığı</div><div class="stat-val red" id="scDebt">0.00 ₼</div></div>
+      </div>
+
+      <!-- Yeni filter: Bu gün / 1 ay / 3 ay / 6 ay / 1 il -->
+      <div class="filter-bar">
+        <button class="filter-btn active" onclick="setFilter('day',this)">Bu gün</button>
+        <button class="filter-btn" onclick="setFilter('m1',this)">Bir ay</button>
+        <button class="filter-btn" onclick="setFilter('m3',this)">Üç ay</button>
+        <button class="filter-btn" onclick="setFilter('m6',this)">Altı ay</button>
+        <button class="filter-btn" onclick="setFilter('y1',this)">Bir il</button>
+      </div>
+
+      <!-- Bar chart: Kateqoriya üzrə satış -->
+      <div class="chart-card">
+        <div class="chart-title">Kateqoriya üzrə satış (₼)</div>
+        <canvas id="chartBar" style="width:100%;display:block"></canvas>
+        <div id="chartBarEmpty" class="chart-empty" style="display:none">Bu dövr üçün məlumat yoxdur</div>
+      </div>
+
+      <!-- Pie chart: Paylanma -->
+      <div class="chart-card">
+        <div class="chart-title">Kateqoriya paylanması</div>
+        <div class="pie-wrap">
+          <canvas id="chartPie" width="130" height="130" style="flex-shrink:0"></canvas>
+          <div id="pieLegend" class="pie-legend"></div>
+        </div>
+        <div id="chartPieEmpty" class="chart-empty" style="display:none">Bu dövr üçün məlumat yoxdur</div>
+      </div>
+    </div>
+
+    <!-- ── ALIŞLAR ── -->
+    <div class="tab-panel" id="tab-purch">
+      <div class="section-title">Alışlar</div>
+      <div id="purchList"><div class="empty">Alış məlumatı yoxdur</div></div>
+    </div>
+
+    <!-- ── ÖDƏNİŞLƏR ── -->
+    <div class="tab-panel" id="tab-pay">
+      <div class="section-title">Ödəniş tarixçəsi</div>
+      <div id="payList"><div class="empty">Ödəniş məlumatı yoxdur</div></div>
+    </div>
+
+    <!-- ── BONUS ── -->
+    <div class="tab-panel" id="tab-bonus">
+      <div class="bonus-card" id="bonusCard">
+        <div class="bonus-star" id="bonusIcon">⭐</div>
+        <div class="bonus-lbl" id="bonusLbl">Bonus balansınız</div>
+        <div class="bonus-val" id="bonusVal">0.00 ₼</div>
+        <div class="bonus-desc" id="bonusDesc">Bu bonus mağaza tərəfindən sizin alışlarınıza görə hesablanmışdır.<br>Növbəti ödənişdə istifadə edilə bilər.</div>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<!-- PROFİL -->
+<div id="screenProfile">
+  <div class="prof-topbar">
+    <div class="prof-back" onclick="closeProfile()">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"/></svg>Geri
+    </div>
+    <div class="prof-avatar" id="profAvatarInit">?</div>
+    <div style="font-size:20px;font-weight:800;color:#fff;text-align:center;margin-bottom:4px" id="profName">—</div>
+    <div style="font-size:13px;color:#c4b5fd;text-align:center" id="profEmail">—</div>
+  </div>
+  <div class="prof-body">
+    <div class="prof-card">
+      <div class="prof-row">
+        <div class="prof-row-ico">📧</div>
+        <div><div class="prof-row-lbl">Gmail</div><div class="prof-row-val" id="profEmailRow">—</div></div>
+      </div>
+      <div class="prof-row" id="profPhoneRow" style="display:none">
+        <div class="prof-row-ico">📞</div>
+        <div><div class="prof-row-lbl">Telefon</div><div class="prof-row-val" id="profPhone">—</div></div>
+      </div>
+      <div class="prof-row" id="profAddrRow" style="display:none">
+        <div class="prof-row-ico">📍</div>
+        <div><div class="prof-row-lbl">Ünvan</div><div class="prof-row-val" id="profAddr">—</div></div>
+      </div>
+      <div class="prof-row" id="profNoteRow" style="display:none">
+        <div class="prof-row-ico">📝</div>
+        <div><div class="prof-row-lbl">Qeyd</div><div class="prof-row-val" id="profNote" style="font-size:13px;color:#475569">—</div></div>
+      </div>
+      <div class="prof-row">
+        <div class="prof-row-ico">💳</div>
+        <div><div class="prof-row-lbl">Cari borc</div><div class="prof-row-val" id="profDebt" style="color:#b91c1c">0.00 ₼</div></div>
+      </div>
+      <div class="prof-row" id="profBonusRow" style="display:none">
+        <div class="prof-row-ico">⭐</div>
+        <div><div class="prof-row-lbl">Bonus balansı</div><div class="prof-row-val" id="profBonus" style="color:#d97706">0.00 ₼</div></div>
+      </div>
+    </div>
+    <button class="btn-logout" onclick="doLogout()">🚪 Çıxış</button>
+  </div>
+</div>
+
+</div><!-- /phone -->
+<script>
+/* ── Config ──────────────────────────────── */
+const _urlParams = new URLSearchParams(window.location.search);
+let _sbCfg = {};
+try { _sbCfg = JSON.parse(localStorage.getItem('azela_sb_cfg')||'{}'); } catch {}
+const _rawSbUrl = (_urlParams.get('sb')||_sbCfg.sbUrl||'').replace(/\/$/,'');
+const _rawSbKey = _urlParams.get('sbk')||_sbCfg.sbKey||'';
+if (_urlParams.get('sb')&&_urlParams.get('sbk')) {
+  try { localStorage.setItem('azela_sb_cfg',JSON.stringify({sbUrl:_rawSbUrl,sbKey:_rawSbKey})); } catch {}
+}
+let CAN={stock:false,price:false,buyprice:false,group:false,barcode:false,debt:false,purchases:false,payments:false};
+const SB_URL=_rawSbUrl, SB_KEY=_rawSbKey;
+
+(function _init(){
+  if (!SB_URL||!SB_KEY){document.getElementById('screenLogin').style.display='none';document.getElementById('screenSetup').style.display='flex';return;}
+  const saved=localStorage.getItem('azela_user_email');
+  if (saved){document.getElementById('screenLogin').style.display='none';document.getElementById('screenApp').style.display='flex';setTimeout(()=>_autoLogin(saved),100);}
+})();
+
+function resetSetup(){localStorage.removeItem('azela_sb_cfg');location.reload();}
+function doSetup(){
+  const sb=(document.getElementById('setupCode1')?.value||'').trim().replace(/\/$/,'');
+  const sbk=(document.getElementById('setupCode2')?.value||'').trim();
+  const err=document.getElementById('setupErr');
+  if (!sb){if(err)err.textContent='Kod 1 daxil edin';return;}
+  if (!sbk){if(err)err.textContent='Kod 2 daxil edin';return;}
+  if (!sb.startsWith('http')){if(err)err.textContent='Kod 1 düzgün deyil';return;}
+  localStorage.setItem('azela_sb_cfg',JSON.stringify({sbUrl:sb,sbKey:sbk}));
+  location.reload();
+}
+
+/* ── State ───────────────────────────────── */
+let _PRODUCTS=[], _currentSales=[], _currentPmts=[], _currentRets=[];
+let _apkHidden=new Set();
+let _currentBalance=0, _currentEmail='', _currentCustId='';
+let _heartbeatTimer=null, _refreshTimer=null, _visHandler=null;
+let _prodSearchVal='', _apkFilter='day', _opsLoaded=false;
+
+const PAY_LABEL={nagd:'Nağd',nisye:'Nisyə',qismen:'Qismən',evaz:'Əvəzetmə',qaytarma:'↩ Qaytarma'};
+const PAY_CLS  ={nagd:'nagd',nisye:'nisye',qismen:'qismen',evaz:'evaz',qaytarma:'qaytarma'};
+const CAT_COLORS={LCD:'#6366f1',BAT:'#f59e0b',COVER:'#10b981',FLEX:'#ef4444',UL:'#8b5cf6',DIGƏR:'#94a3b8'};
+
+/* ── Tab ─────────────────────────────────── */
+function switchTab(name,el){
+  document.querySelectorAll('.tab').forEach(t=>t.classList.remove('active'));
+  document.querySelectorAll('.tab-panel').forEach(p=>p.classList.remove('active'));
+  el.classList.add('active');
+  document.getElementById('tab-'+name).classList.add('active');
+  if(_opsTimer){clearInterval(_opsTimer);_opsTimer=null;}
+  if(name==='ops'){
+    loadOpsData();
+    setTimeout(_redrawCharts,50);
+    _opsTimer=setInterval(loadOpsData,30000);
+  } else if(name==='purch'||name==='pay'){
+    loadOpsData();
+    _opsTimer=setInterval(loadOpsData,30000);
+  }
+}
+
+/* ── Filter ──────────────────────────────── */
+function setFilter(name,btn){
+  _apkFilter=name;
+  document.querySelectorAll('.filter-btn').forEach(b=>b.classList.remove('active'));
+  btn.classList.add('active');
+  _refreshDisplay();
+}
+
+function _cutoff(days){ return Date.now()-days*86400000; }
+
+function _dateInFilter(d){
+  const ts=new Date((d||'').slice(0,10)).getTime();
+  if (isNaN(ts)) return false;
+  if (_apkFilter==='day')  return (d||'').slice(0,10)===new Date().toISOString().slice(0,10);
+  if (_apkFilter==='m1')   return ts>=_cutoff(30);
+  if (_apkFilter==='m3')   return ts>=_cutoff(90);
+  if (_apkFilter==='m6')   return ts>=_cutoff(180);
+  if (_apkFilter==='y1')   return ts>=_cutoff(365);
+  return true;
+}
+
+function _refreshDisplay(){
+  const fS=_currentSales.filter(s=>_dateInFilter(s.date));
+  const fP=_currentPmts.filter(p=>_dateInFilter(p.date));
+  const fR=_currentRets.filter(r=>_dateInFilter(r.date));
+  const retAsSales=fR.map(r=>({id:r.id,date:r.date||'',payment_type:'qaytarma',
+    items_json:JSON.stringify([{name:r.product_name||'',qty:r.qty||0,sellPrice:r.price||0}]),
+    total:r.total||0,paid:r.total||0,debt:0}));
+  const allPurch=[...fS,...retAsSales].sort((a,b)=>(b.date||'').localeCompare(a.date||''));
+  _renderStats(fS,fR);
+  _renderCharts(fS);
+  _renderPurchases(allPurch);
+  _renderPayments(fP);
+}
+
+/* ── Stat kartları ───────────────────────── */
+function _renderStats(sales,rets){
+  const nonEvaz=(sales||[]).filter(s=>s.payment_type!=='evaz'&&s.payment_type!=='qaytarma');
+  const totalRet=(rets||[]).reduce((s,r)=>s+(r.total||0),0);
+  const totalSell=nonEvaz.reduce((s,x)=>s+(x.total||0),0)-totalRet;
+  const totalDebt=_currentBalance<0?Math.abs(_currentBalance):0;
+  const totalPaid=Math.max(0,totalSell-totalDebt);
+  const e1=document.getElementById('scCount'),e2=document.getElementById('scSell');
+  const e3=document.getElementById('scPaid'),e4=document.getElementById('scDebt');
+  if(e1)e1.textContent=nonEvaz.length;
+  if(e2)e2.textContent=totalSell.toFixed(2)+' ₼';
+  if(e3)e3.textContent=totalPaid.toFixed(2)+' ₼';
+  if(e4){e4.textContent=totalDebt.toFixed(2)+' ₼';e4.className='stat-val '+(totalDebt>0?'red':'green');}
+}
+
+/* ── Kateqoriya müəyyənləşdirmə ─────────── */
+function _getCategory(name){
+  const n=(name||'').toUpperCase();
+  if(n.includes('LCD'))   return 'LCD';
+  if(n.includes('BAT'))   return 'BAT';
+  if(n.includes('COVER')) return 'COVER';
+  if(n.includes('FLEX'))  return 'FLEX';
+  if(n.includes('UL'))    return 'UL';
+  return 'DIGƏR';
+}
+
+function _buildChartData(sales){
+  const cats={};
+  (sales||[]).filter(s=>s.payment_type!=='evaz'&&s.payment_type!=='qaytarma').forEach(s=>{
+    const items=(()=>{try{return JSON.parse(s.items_json||'[]');}catch{return [];}})();
+    items.forEach(it=>{
+      const cat=_getCategory(it.name||'');
+      cats[cat]=(cats[cat]||0)+(it.qty||1)*(it.sellPrice||0);
+    });
+  });
+  return Object.entries(cats).filter(([,v])=>v>0).sort((a,b)=>b[1]-a[1])
+    .map(([name,val])=>({name,val,color:CAT_COLORS[name]||CAT_COLORS.DIGƏR}));
+}
+
+/* ── Bar chart ───────────────────────────── */
+function _drawBar(data){
+  const canvas=document.getElementById('chartBar');
+  const emptyEl=document.getElementById('chartBarEmpty');
+  if (!canvas) return;
+  if (!data.length){canvas.style.display='none';if(emptyEl)emptyEl.style.display='';return;}
+  if(emptyEl)emptyEl.style.display='none';
+  canvas.style.display='block';
+  const dpr=window.devicePixelRatio||1;
+  const W=canvas.parentElement.clientWidth-28||320;
+  const H=180;
+  canvas.width=W*dpr; canvas.height=H*dpr;
+  canvas.style.width=W+'px'; canvas.style.height=H+'px';
+  const ctx=canvas.getContext('2d');
+  ctx.scale(dpr,dpr);
+  ctx.clearRect(0,0,W,H);
+
+  const pad={l:38,r:8,t:22,b:28};
+  const cW=W-pad.l-pad.r, cH=H-pad.t-pad.b;
+  const maxVal=Math.max(...data.map(d=>d.val),1);
+  const bW=Math.min(36,(cW/data.length)*0.55);
+  const slot=cW/data.length;
+
+  // Gridlines + Y labels
+  ctx.textAlign='right'; ctx.font=`${10*dpr/dpr}px sans-serif`;
+  for(let i=0;i<=4;i++){
+    const y=pad.t+cH-(i/4)*cH;
+    ctx.strokeStyle='#f1f5f9'; ctx.lineWidth=1;
+    ctx.beginPath(); ctx.moveTo(pad.l,y); ctx.lineTo(W-pad.r,y); ctx.stroke();
+    ctx.fillStyle='#94a3b8';
+    const v=maxVal*i/4; ctx.fillText(v>=1000?(v/1000).toFixed(1)+'k':v.toFixed(0),pad.l-4,y+3.5);
+  }
+
+  // Bars
+  data.forEach((d,i)=>{
+    const x=pad.l+i*slot+(slot-bW)/2;
+    const bH=Math.max((d.val/maxVal)*cH,2);
+    const y=pad.t+cH-bH;
+    // Draw bar with rounded top
+    const r=Math.min(5,bW/3);
+    ctx.fillStyle=d.color;
+    ctx.beginPath();
+    ctx.moveTo(x+r,y); ctx.lineTo(x+bW-r,y);
+    ctx.arcTo(x+bW,y,x+bW,y+r,r); ctx.lineTo(x+bW,y+bH); ctx.lineTo(x,y+bH); ctx.lineTo(x,y+r);
+    ctx.arcTo(x,y,x+r,y,r); ctx.closePath(); ctx.fill();
+    // Value above bar
+    ctx.fillStyle='#1e293b'; ctx.textAlign='center';
+    const lbl=d.val>=1000?(d.val/1000).toFixed(1)+'k':d.val.toFixed(0);
+    ctx.fillText(lbl,x+bW/2,y-5);
+    // Category label below
+    ctx.fillStyle='#64748b';
+    ctx.fillText(d.name,x+bW/2,H-8);
+  });
+}
+
+/* ── Pie chart ───────────────────────────── */
+function _drawPie(data){
+  const canvas=document.getElementById('chartPie');
+  const legend=document.getElementById('pieLegend');
+  const emptyEl=document.getElementById('chartPieEmpty');
+  if(!canvas) return;
+  const total=data.reduce((s,d)=>s+d.val,0);
+  const ctx=canvas.getContext('2d');
+  ctx.clearRect(0,0,130,130);
+  if(!total){
+    if(emptyEl)emptyEl.style.display='';
+    canvas.style.display='none';
+    if(legend)legend.innerHTML='';
+    return;
+  }
+  if(emptyEl)emptyEl.style.display='none';
+  canvas.style.display='block';
+  // Pie slices
+  let angle=-Math.PI/2;
+  const cx=65,cy=65,r=60;
+  data.forEach(d=>{
+    const slice=(d.val/total)*2*Math.PI;
+    ctx.beginPath(); ctx.moveTo(cx,cy);
+    ctx.arc(cx,cy,r,angle,angle+slice); ctx.closePath();
+    ctx.fillStyle=d.color; ctx.fill();
+    angle+=slice;
+  });
+  // Donut hole
+  ctx.beginPath(); ctx.arc(cx,cy,32,0,2*Math.PI);
+  ctx.fillStyle='#fff'; ctx.fill();
+  // Center text
+  ctx.fillStyle='#1e293b'; ctx.textAlign='center'; ctx.font='bold 11px sans-serif';
+  ctx.fillText(total>=1000?(total/1000).toFixed(1)+'k₼':total.toFixed(0)+'₼',cx,cy+4);
+  // Legend
+  if(legend){
+    legend.innerHTML=data.map(d=>`
+      <div class="pie-legend-row">
+        <div class="pie-dot" style="background:${d.color}"></div>
+        <div><div class="pie-lbl">${d.name}</div>
+          <div class="pie-sub">${d.val.toFixed(0)} ₼ · ${((d.val/total)*100).toFixed(0)}%</div>
+        </div>
+      </div>`).join('');
+  }
+}
+
+function _renderCharts(sales){ const data=_buildChartData(sales); _drawBar(data); _drawPie(data); }
+function _redrawCharts(){ _renderCharts(_currentSales.filter(s=>_dateInFilter(s.date))); }
+
+/* ── Alışlar ─────────────────────────────── */
+function _renderPurchases(sales){
+  const el=document.getElementById('purchList');
+  if(!el) return;
+  if(!sales||!sales.length){el.innerHTML='<div class="empty">Bu dövr üçün alış yoxdur</div>';return;}
+  el.innerHTML=sales.map(s=>{
+    const items=(()=>{try{return JSON.parse(s.items_json||'[]');}catch{return[];}})();
+    const pt=s.payment_type||'nisye';
+    const isRet=pt==='qaytarma',isEvaz=pt==='evaz';
+    const debt=s.debt||0;
+    const dateStr=(s.date||'').slice(0,16).replace('T',' ');
+    const borcHtml=(!isRet&&!isEvaz)?`
+      <div style="flex-shrink:0;text-align:right;min-width:54px;padding-top:7px;border-top:1px solid #f1f5f9">
+        <div style="font-size:10px;font-weight:700;color:#94a3b8;text-transform:uppercase;letter-spacing:.3px;margin-bottom:3px">Borc</div>
+        <div style="font-size:14px;font-weight:800;color:${debt>0?'#dc2626':'#16a34a'}">${debt>0?debt.toFixed(2)+' ₼':'✓'}</div>
+      </div>`:'';
+    const itemsHtml=items.map(it=>`
+      <div class="purch-item">
+        <div><div class="purch-item-name">${it.name||'—'}</div>${!isEvaz?`<div class="purch-item-qty">${it.qty||1} ədəd</div>`:''}</div>
+        ${!isEvaz?`<div style="font-size:13px;font-weight:700;color:${isRet?'#0f766e':'#7c3aed'}">${isRet?'-':''}${((it.qty||1)*(it.sellPrice||0)).toFixed(2)} ₼</div>`:''}
+      </div>`).join('');
+    const totalHtml=(!isEvaz&&items.length)?`<div class="purch-total" style="margin-top:6px">
+      <span style="font-size:13px;color:#64748b">Cəmi</span>
+      <span style="font-size:14px;font-weight:800;color:${isRet?'#0f766e':'#1e293b'}">${isRet?'-':''}${(s.total||0).toFixed(2)} ₼</span></div>`:'';
+    return `<div class="purch-card" style="${isRet?'border-left:3px solid #0d9488;':''}">
+      <div class="purch-head">
+        <span class="purch-date">${dateStr}</span>
+        <span class="purch-badge ${PAY_CLS[pt]||'nisye'}">${PAY_LABEL[pt]||pt}</span>
+      </div>
+      <div style="display:flex;align-items:flex-end;justify-content:space-between;gap:8px">
+        <div style="flex:1;border-top:1px solid #f1f5f9;padding-top:7px">${itemsHtml}${totalHtml}</div>
+        ${borcHtml}
+      </div></div>`;
+  }).join('');
+}
+
+/* ── Ödənişlər ───────────────────────────── */
+function _renderPayments(pmts){
+  const el=document.getElementById('payList');
+  if(!el) return;
+  if(!pmts||!pmts.length){el.innerHTML='<div class="empty">Bu dövr üçün ödəniş yoxdur</div>';return;}
+  const sorted=[...pmts].sort((a,b)=>{
+    const da=(a.date||''), db2=(b.date||'');
+    if(da!==db2) return db2.localeCompare(da);
+    return (b.id||'').localeCompare(a.id||'');
+  });
+  el.innerHTML=sorted.map(p=>{
+    const d=p.date||'';
+    const dateStr=d.slice(0,10);
+    const timeStr=d.length>=16?d.slice(11,16):'';
+    return `<div class="pay-card">
+      <div style="display:flex;justify-content:space-between;align-items:center">
+        <div><div style="font-size:13px;font-weight:700;color:#1e293b">Ödəniş</div>
+          <div style="font-size:12px;color:#94a3b8;margin-top:2px">${dateStr}${timeStr?' · '+timeStr:''}</div>
+          ${p.note?`<div style="font-size:12px;color:#64748b;margin-top:3px">${p.note}</div>`:''}
+        </div>
+        <div style="font-size:16px;font-weight:800;color:#16a34a">+${(p.amount||0).toFixed(2)} ₼</div>
+      </div></div>`;
+  }).join('');
+}
+
+/* ── Məhsullar ───────────────────────────── */
+function renderProds(list){
+  const el=document.getElementById('prodList');
+  if(!el) return;
+  if(!list||!list.length){el.innerHTML='<div class="empty" style="padding:32px 20px">Məhsul tapılmadı</div>';return;}
+  el.innerHTML=list.map(p=>{
+    const _stk=p.stock!=null?parseFloat(p.stock):null;
+    const _stkFmt=_stk!=null?(_stk%1===0?String(_stk):_stk.toFixed(3).replace(/\.?0+$/,'')):'';
+    const sub=[p.code?'Kod: '+p.code:'',CAN.stock&&_stk!=null?'Stok: '+_stkFmt+' ədəd':'',
+      CAN.group&&p.group_name?p.group_name:'',CAN.barcode&&p.barcode?p.barcode:''].filter(Boolean).join(' · ');
+    const priceHtml=CAN.price?`<div style="text-align:right">
+      <div style="font-size:15px;font-weight:800;color:#7c3aed">${p.sell_price!=null?p.sell_price+' ₼':'—'}</div>
+      ${CAN.buyprice&&p.buy_price?`<div style="font-size:11px;color:#94a3b8">Alış: ${p.buy_price} ₼</div>`:''}</div>`:'';
+    return `<div class="prod-card"><div class="prod-info"><div class="prod-name">${p.name}</div>${sub?`<div class="prod-code">${sub}</div>`:''}</div>${priceHtml}</div>`;
+  }).join('');
+}
+
+let _prodSearchTimer=null, _opsTimer=null;
+function filterProds(){
+  const q=(document.getElementById('prodSearch').value||'').trim();
+  _prodSearchVal=q;
+  const el=document.getElementById('prodList');
+  if(!q){
+    if(el) el.innerHTML='<div class="empty" style="padding:32px 20px;color:#94a3b8">Məhsul adı yazın...</div>';
+    return;
+  }
+  if(el) el.innerHTML='<div class="empty" style="padding:24px 20px;color:#94a3b8">Axtarılır...</div>';
+  clearTimeout(_prodSearchTimer);
+  _prodSearchTimer=setTimeout(()=>_searchProds(q),400);
+}
+
+async function _loadAllProds(){
+  if(!SB_URL||!SB_KEY) return;
+  try{
+    const results=await _sbGet('products?order=name.asc&limit=2000');
+    if(_prodSearchVal) return; // istifadəçi artıq axtarış başlayıbsa göstərmə
+    _PRODUCTS=(results||[]).filter(p=>!_apkHidden.has(String(p.id)));
+    renderProds(_PRODUCTS);
+  }catch(e){}
+}
+
+async function _searchProds(q){
+  if(!SB_URL||!SB_KEY) return;
+  try{
+    const enc=encodeURIComponent('%'+q+'%');
+    const results=await _sbGet('products?or=(name.ilike.'+enc+',code.ilike.'+enc+')&order=name.asc');
+    if(_prodSearchVal!==q) return;
+    renderProds((results||[]).filter(p=>!_apkHidden.has(String(p.id))));
+  }catch(e){
+    const el=document.getElementById('prodList');
+    if(el) el.innerHTML='<div class="empty" style="padding:24px 20px;color:#ef4444">Bağlantı xətası</div>';
+  }
+}
+
+/* ── Supabase ────────────────────────────── */
+async function _sbGet(path){
+  if(!SB_URL||!SB_KEY) return null;
+  try{const r=await fetch(SB_URL+'/rest/v1/'+path,{headers:{apikey:SB_KEY,Authorization:'Bearer '+SB_KEY}});return r.ok?r.json():null;}catch{return null;}
+}
+async function _sbPost(path,body){
+  if(!SB_URL||!SB_KEY) return;
+  try{await fetch(SB_URL+'/rest/v1/'+path,{method:'POST',
+    headers:{'Content-Type':'application/json','apikey':SB_KEY,'Authorization':'Bearer '+SB_KEY,'Prefer':'resolution=merge-duplicates,return=minimal'},
+    body:JSON.stringify(body)});}catch{}
+}
+async function sbHeartbeat(e){await _sbPost('customer_status',{email:e,last_seen:new Date().toISOString(),device:'web'});}
+
+/* ── Data yüklə ──────────────────────────── */
+async function loadProdsData(){
+  if(!_currentCustId||!SB_URL||!SB_KEY) return;
+  const btn=document.getElementById('refreshBtn');
+  if(btn) btn.textContent='↻ ...';
+  try{
+    const [custArr,settingsRows,bonusRows,hiddenRows]=await Promise.all([
+      _sbGet('customers?id=eq.'+encodeURIComponent(_currentCustId)+'&limit=1'),
+      _sbGet('app_settings?key=eq.show&limit=1'),
+      _sbGet('app_settings?key=eq.customer_bonuses&limit=1'),
+      _sbGet('app_settings?key=eq.apkHiddenProducts&limit=1')
+    ]);
+    _apkHidden=new Set(hiddenRows&&hiddenRows[0]?JSON.parse(hiddenRows[0].value||'[]'):[]);
+    const cust=custArr&&custArr[0]; if(!cust) return;
+    if(settingsRows&&settingsRows.length){
+      const sv=(settingsRows[0].value||'').split(',').map(x=>x.trim());
+      CAN.stock=sv.includes('stock');CAN.price=sv.includes('price');CAN.buyprice=sv.includes('buyprice');
+      CAN.group=sv.includes('group');CAN.barcode=sv.includes('barcode');CAN.debt=sv.includes('debt');
+      CAN.purchases=sv.includes('purchases');CAN.payments=sv.includes('payments');
+    } else {CAN.stock=true;CAN.price=true;CAN.debt=true;CAN.purchases=true;CAN.payments=true;}
+
+    _currentBalance=cust.balance||0;
+    const debt=_currentBalance<0?Math.abs(_currentBalance):0;
+    const td=document.getElementById('topbarDebt');
+    if(td){td.textContent=debt.toFixed(2)+' ₼';td.className='topbar-cari-val '+(debt>0?'red':'green');}
+    const pd=document.getElementById('profDebt');
+    if(pd){pd.textContent=debt.toFixed(2)+' ₼';pd.style.color=debt>0?'#b91c1c':'#16a34a';}
+
+    const _bonusMap=bonusRows&&bonusRows[0]?JSON.parse(bonusRows[0].value||'{}'):{};
+    const _bonus=_bonusMap[_currentCustId]||0;
+    const bonusVal=document.getElementById('bonusVal');
+    if(bonusVal)bonusVal.textContent=_bonus.toFixed(2)+' ₼';
+    const bonusCard=document.getElementById('bonusCard');
+    const bonusIcon=document.getElementById('bonusIcon');
+    const bonusLbl=document.getElementById('bonusLbl');
+    const bonusDesc=document.getElementById('bonusDesc');
+    if(_bonus>0){
+      if(bonusCard){bonusCard.style.background='linear-gradient(135deg,#fef9c3,#fef3c7)';bonusCard.style.borderColor='#fde047';}
+      if(bonusIcon)bonusIcon.textContent='⭐';
+      if(bonusLbl)bonusLbl.textContent='Bonus balansınız';
+      if(bonusDesc)bonusDesc.textContent='Bu bonus mağaza tərəfindən sizin alışlarınıza görə hesablanmışdır. Növbəti ödənişdə istifadə edilə bilər.';
+    } else {
+      if(bonusCard){bonusCard.style.background='linear-gradient(135deg,#f8fafc,#f1f5f9)';bonusCard.style.borderColor='#e2e8f0';}
+      if(bonusIcon)bonusIcon.textContent='🎯';
+      if(bonusLbl){bonusLbl.textContent='Bonus yoxdur';bonusLbl.style.color='#64748b';}
+      if(bonusDesc)bonusDesc.textContent='Mağazadan alış etdikcə bonus qazanacaqsınız.';
+      if(bonusVal){bonusVal.style.color='#94a3b8';}
+    }
+    const pb=document.getElementById('profBonus');
+    const pbRow=document.getElementById('profBonusRow');
+    if(pb)pb.textContent=_bonus.toFixed(2)+' ₼';
+    if(pbRow)pbRow.style.display=_bonus>0?'':'none';
+
+    document.getElementById('tabBtn-purch').style.display=CAN.purchases?'':'none';
+    document.getElementById('tabBtn-pay').style.display=CAN.payments?'':'none';
+  }catch(e){}
+  if(btn) btn.textContent='↻ Yenilə';
+}
+
+async function loadOpsData(){
+  if(!_currentCustId||!SB_URL||!SB_KEY) return;
+  try{
+    const [sales,pmts,rets]=await Promise.all([
+      _sbGet('sales?customer_id=eq.'+encodeURIComponent(_currentCustId)+'&order=date.desc'),
+      _sbGet('payments?customer_id=eq.'+encodeURIComponent(_currentCustId)+'&order=date.desc'),
+      _sbGet('returns?customer_id=eq.'+encodeURIComponent(_currentCustId)+'&order=date.desc')
+    ]);
+    _currentSales=sales||[];_currentPmts=pmts||[];_currentRets=rets||[];
+    _opsLoaded=true;
+    _refreshDisplay();
+    setTimeout(_redrawCharts,50);
+  }catch(e){}
+}
+
+async function refreshData(){
+  await loadProdsData();
+  const activePanel=document.querySelector('.tab-panel.active');
+  if(activePanel&&activePanel.id==='tab-ops') await loadOpsData();
+}
+
+/* ── Visibility: arxa fondada dayanır ───── */
+function _setupTimers(){
+  if(_visHandler) document.removeEventListener('visibilitychange',_visHandler);
+  _visHandler=()=>{
+    if(document.visibilityState==='visible'&&_currentCustId){
+      loadProdsData();
+      if(!_refreshTimer) _refreshTimer=setInterval(loadProdsData,20000);
+    } else if(document.visibilityState==='hidden'){
+      if(_refreshTimer){clearInterval(_refreshTimer);_refreshTimer=null;}
+      if(_opsTimer){clearInterval(_opsTimer);_opsTimer=null;}
+    }
+  };
+  document.addEventListener('visibilitychange',_visHandler);
+  if(_refreshTimer) clearInterval(_refreshTimer);
+  _refreshTimer=setInterval(loadProdsData,20000);
+}
+
+/* ── Login ───────────────────────────────── */
+function _setCustUI(cust,email){
+  const init=(cust.name||'?').split(' ').map(w=>w[0]).join('').slice(0,2).toUpperCase();
+  [['avatarInit',init],['custName',cust.name||''],['custEmail',email],
+   ['profName',cust.name||''],['profEmail',email],['profEmailRow',email],['profAvatarInit',init]
+  ].forEach(([id,v])=>{const e=document.getElementById(id);if(e)e.textContent=v;});
+  // Telefon
+  const phRow=document.getElementById('profPhoneRow');
+  const phVal=document.getElementById('profPhone');
+  if(cust.phone){if(phRow)phRow.style.display='';if(phVal)phVal.textContent=cust.phone;}
+  else{if(phRow)phRow.style.display='none';}
+  // Ünvan
+  const adRow=document.getElementById('profAddrRow');
+  const adVal=document.getElementById('profAddr');
+  if(cust.addr){if(adRow)adRow.style.display='';if(adVal)adVal.textContent=cust.addr;}
+  else{if(adRow)adRow.style.display='none';}
+  // Qeyd
+  const ntRow=document.getElementById('profNoteRow');
+  const ntVal=document.getElementById('profNote');
+  if(cust.note){if(ntRow)ntRow.style.display='';if(ntVal)ntVal.textContent=cust.note;}
+  else{if(ntRow)ntRow.style.display='none';}
+}
+
+async function _autoLogin(email){
+  if(!email||!SB_URL||!SB_KEY) return;
+  try{
+    const custs=await _sbGet('customers?email=ilike.'+encodeURIComponent(email)+'&limit=1');
+    if(!custs||!custs.length){localStorage.removeItem('azela_user_email');document.getElementById('screenApp').style.display='none';document.getElementById('screenLogin').style.display='flex';return;}
+    const cust=custs[0];_currentEmail=email;_currentCustId=cust.id;
+    _setCustUI(cust,email);
+    await loadProdsData();
+    sbHeartbeat(email);
+    if(_heartbeatTimer) clearInterval(_heartbeatTimer);
+    _heartbeatTimer=setInterval(()=>sbHeartbeat(_currentEmail),5*60*1000);
+    _setupTimers();
+  }catch(e){document.getElementById('screenApp').style.display='none';document.getElementById('screenLogin').style.display='flex';}
+}
+
+async function doLogin(){
+  const email=(document.getElementById('loginEmail')?.value||'').trim().toLowerCase();
+  const errEl=document.getElementById('loginErr'),btnEl=document.getElementById('loginBtn');
+  if(!email){if(errEl)errEl.textContent='Gmail daxil edin';return;}
+  if(!SB_URL||!SB_KEY){if(errEl)errEl.textContent='Sistem bağlantısı yoxdur.';return;}
+  if(errEl)errEl.textContent='';if(btnEl){btnEl.textContent='Yoxlanılır...';btnEl.disabled=true;}
+  try{
+    const custs=await _sbGet('customers?email=ilike.'+encodeURIComponent(email)+'&limit=1');
+    if(!custs||!custs.length){if(errEl)errEl.textContent='Bu Gmail ilə müştəri tapılmadı';if(btnEl){btnEl.innerHTML='Daxil ol';btnEl.disabled=false;}return;}
+    const cust=custs[0];_currentEmail=email;_currentCustId=cust.id;
+    localStorage.setItem('azela_user_email',email);
+    _setCustUI(cust,email);
+    document.getElementById('screenLogin').style.display='none';
+    document.getElementById('screenApp').style.display='flex';
+    await loadProdsData();
+    sbHeartbeat(email);
+    if(_heartbeatTimer) clearInterval(_heartbeatTimer);
+    _heartbeatTimer=setInterval(()=>sbHeartbeat(_currentEmail),5*60*1000);
+    _setupTimers();
+  }catch(e){if(errEl)errEl.textContent='Bağlantı xətası.';if(btnEl){btnEl.innerHTML='Daxil ol';btnEl.disabled=false;}}
+}
+
+function openProfile() {document.getElementById('screenProfile').style.display='flex';}
+function closeProfile(){document.getElementById('screenProfile').style.display='none';}
+function doLogout(){
+  if(_heartbeatTimer){clearInterval(_heartbeatTimer);_heartbeatTimer=null;}
+  if(_refreshTimer){clearInterval(_refreshTimer);_refreshTimer=null;}
+  if(_visHandler){document.removeEventListener('visibilitychange',_visHandler);_visHandler=null;}
+  _currentEmail='';_currentCustId='';
+  localStorage.removeItem('azela_user_email');
+  closeProfile();
+  document.getElementById('screenApp').style.display='none';
+  document.getElementById('screenLogin').style.display='flex';
+  const e=document.getElementById('loginEmail');if(e)e.value='';
+  const er=document.getElementById('loginErr');if(er)er.textContent='';
+}
+</script>
+</body>
+</html>
