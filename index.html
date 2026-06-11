@@ -3,166 +3,332 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>AZELA Pro</title>
+<title>AZELA Pro — Biznes İdarəetmə Sistemi</title>
 <style>
-*{box-sizing:border-box;margin:0;padding:0;}
-body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;background:#0a0015;color:#f0e6ff;min-height:100vh;}
-.hero{display:flex;flex-direction:column;align-items:center;justify-content:center;min-height:100vh;padding:64px 20px 48px;text-align:center;}
-.logo{font-family:Georgia,serif;font-size:72px;font-weight:700;color:#fff;letter-spacing:0.15em;margin-bottom:12px;}
-.tagline{font-size:16px;color:#a78bfa;margin-bottom:52px;letter-spacing:.02em;}
-
-.cards{display:flex;gap:24px;justify-content:center;align-items:stretch;width:100%;max-width:720px;margin-bottom:32px;}
-.card{flex:1;display:flex;flex-direction:column;border-radius:20px;padding:28px 26px 24px;text-align:left;}
-.card.pro{background:rgba(139,92,246,0.15);border:1.5px solid rgba(139,92,246,0.45);}
-.card.apk{background:rgba(59,130,246,0.12);border:1.5px solid rgba(59,130,246,0.4);}
-
-.badge{display:inline-block;font-size:10px;font-weight:800;letter-spacing:.8px;text-transform:uppercase;padding:3px 10px;border-radius:20px;margin-bottom:14px;}
-.badge.pro{background:rgba(139,92,246,0.3);color:#c4b5fd;}
-.badge.apk{background:rgba(59,130,246,0.25);color:#93c5fd;}
-
-.card-name{font-size:22px;font-weight:800;color:#fff;margin-bottom:8px;}
-.card-desc{font-size:13px;color:#a78bfa;line-height:1.6;margin-bottom:18px;}
-
-.feats{list-style:none;margin-bottom:auto;padding-bottom:22px;}
-.feats li{font-size:12.5px;color:#c4b5fd;padding:4px 0 4px 18px;position:relative;}
-.feats li::before{content:'✓';position:absolute;left:0;color:#8b5cf6;font-weight:700;}
-.feats.apk li::before{color:#3b82f6;}
-
-.btn{display:flex;align-items:center;justify-content:center;gap:8px;width:100%;padding:14px;border-radius:12px;font-size:15px;font-weight:700;text-decoration:none;transition:opacity .2s;margin-top:22px;margin-bottom:10px;}
-.btn.pro{background:linear-gradient(135deg,#8b5cf6,#6d28d9);color:#fff;}
-.btn.apk{background:linear-gradient(135deg,#3b82f6,#1d4ed8);color:#fff;}
-.btn:hover{opacity:.85;}
-
-.ver{font-size:12px;color:#6b4fa0;text-align:center;}
-.req{font-size:12px;color:#4c1d95;background:rgba(124,58,237,0.1);padding:8px 20px;border-radius:20px;display:inline-block;}
-
-/* Features section */
-.features{width:100%;max-width:800px;margin:64px auto 0;}
-.features-title{font-size:13px;font-weight:700;letter-spacing:.12em;text-transform:uppercase;color:#6b4fa0;margin-bottom:32px;}
-.feat-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:16px;margin-bottom:48px;}
-.feat-item{background:rgba(139,92,246,0.07);border:1px solid rgba(139,92,246,0.18);border-radius:14px;padding:20px 18px;}
-.feat-icon{font-size:22px;margin-bottom:10px;}
-.feat-name{font-size:13px;font-weight:700;color:#e2d9f3;margin-bottom:6px;}
-.feat-text{font-size:12px;color:#7c5fb5;line-height:1.6;}
-
-.divider{width:1px;height:40px;background:rgba(139,92,246,0.2);margin:0 auto 48px;}
-
-.about{max-width:600px;margin:0 auto 64px;font-size:14px;color:#7c5fb5;line-height:1.9;text-align:center;}
-.about b{color:#c4b5fd;}
-
-.footer{font-size:12px;color:#3d1a6e;padding-bottom:32px;}
-
-@media(max-width:700px){
-  .feat-grid{grid-template-columns:repeat(2,1fr);}
-  .cards{flex-direction:column;max-width:360px;}
-  .logo{font-size:52px;margin-bottom:10px;}
+:root{
+  --bg:#f2f6f9;
+  --card:#ffffff;
+  --pl:#e4eff6;
+  --pm:#2e7eaa;
+  --pd:#0f2e45;
+  --pg:#b8975a;
+  --border:#cfe0ec;
+  --text:#0f2030;
+  --text2:#3d5d72;
+  --text3:#7fa2b8;
+  --sh:0 4px 24px rgba(15,46,69,.1);
+  --sh-sm:0 2px 10px rgba(15,46,69,.07);
 }
-@media(max-width:440px){
-  .feat-grid{grid-template-columns:1fr;}
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:'Segoe UI',system-ui,sans-serif;background:var(--bg);color:var(--text);min-height:100vh}
+a{text-decoration:none}
+
+/* NAV */
+nav{position:fixed;top:0;left:0;right:0;z-index:100;background:rgba(242,246,249,.94);backdrop-filter:blur(14px);border-bottom:1px solid var(--border);height:62px;display:flex;align-items:center;justify-content:space-between;padding:0 40px}
+.n-logo{font-size:22px;font-weight:900;color:var(--pd);letter-spacing:.14em}
+.n-logo span{color:var(--pm)}
+.n-dl{display:flex;align-items:center;gap:8px;padding:9px 20px;background:var(--pd);color:#fff;border:none;border-radius:10px;font-size:13.5px;font-weight:700;cursor:pointer;font-family:inherit;transition:background .18s;letter-spacing:.01em}
+.n-dl:hover{background:var(--pm)}
+.n-dl svg{flex-shrink:0}
+
+/* PANEL OVERLAY */
+.ov{position:fixed;inset:0;background:rgba(15,46,69,.38);z-index:200;opacity:0;pointer-events:none;transition:opacity .25s}
+.ov.on{opacity:1;pointer-events:all}
+.rp{position:fixed;top:0;right:0;bottom:0;width:340px;max-width:100vw;background:#fff;z-index:201;transform:translateX(110%);transition:transform .3s cubic-bezier(.25,0,.1,1);box-shadow:-6px 0 40px rgba(15,46,69,.16);display:flex;flex-direction:column}
+.rp.on{transform:translateX(0)}
+.rp-h{padding:20px 18px 16px;background:var(--pd);display:flex;align-items:center;justify-content:space-between;flex-shrink:0}
+.rp-ht{font-size:15px;font-weight:800;color:#fff;letter-spacing:.04em;display:flex;align-items:center;gap:8px}
+.rp-x{width:32px;height:32px;border-radius:8px;background:rgba(255,255,255,.14);color:#fff;border:none;font-size:20px;font-weight:700;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:background .15s;font-family:inherit;line-height:1}
+.rp-x:hover{background:rgba(255,255,255,.28)}
+.rp-b{padding:14px;overflow-y:auto;flex:1;display:flex;flex-direction:column;gap:12px}
+
+/* DL CARDS */
+.dlc{border-radius:14px;border:1.5px solid var(--border);background:#fff;padding:16px 18px;transition:box-shadow .15s}
+.dlc:hover{box-shadow:var(--sh)}
+.dlc-h{display:flex;align-items:center;gap:11px;margin-bottom:10px}
+.dlc-ico{width:42px;height:42px;border-radius:11px;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.dlc-name{font-size:14px;font-weight:800;color:var(--text)}
+.dlc-sub{font-size:11.5px;color:var(--text3);margin-top:2px}
+.dlc-desc{font-size:12.5px;color:var(--text2);line-height:1.65;margin-bottom:13px}
+.dl-btn{display:flex;align-items:center;justify-content:center;gap:7px;width:100%;padding:11px;border-radius:9px;font-size:13px;font-weight:700;border:none;cursor:pointer;font-family:inherit;transition:opacity .15s;color:#fff}
+.dl-btn:hover{opacity:.87}
+.dl-btn.win{background:var(--pd)}
+.dl-btn.apk{background:#1a7a4e}
+.dl-btn.cust{background:var(--pm)}
+.dl-ver{font-size:11px;color:var(--text3);text-align:center;margin-top:7px}
+.dl-mob{font-size:11.5px;background:var(--pl);border-radius:8px;padding:9px 12px;color:var(--text2);text-align:center;margin-top:8px;display:flex;align-items:center;justify-content:center;gap:7px}
+
+/* HERO */
+.hero{padding:130px 32px 72px;text-align:center}
+.h-badge{display:inline-flex;align-items:center;gap:6px;background:var(--pl);color:var(--pm);font-size:11.5px;font-weight:800;letter-spacing:.08em;text-transform:uppercase;padding:5px 14px;border-radius:20px;margin-bottom:18px;border:1px solid var(--border)}
+.h-title{font-size:54px;font-weight:900;color:var(--pd);line-height:1.08;margin-bottom:14px;letter-spacing:-.02em;max-width:700px;margin-left:auto;margin-right:auto}
+.h-title span{color:var(--pm)}
+.h-sub{font-size:17px;color:var(--text2);line-height:1.68;max-width:560px;margin:0 auto 36px}
+.h-btns{display:flex;align-items:center;justify-content:center;gap:12px;flex-wrap:wrap}
+.h-btn-p{display:inline-flex;align-items:center;gap:8px;padding:14px 28px;background:var(--pd);color:#fff;border-radius:12px;font-size:15px;font-weight:700;border:none;cursor:pointer;font-family:inherit;transition:background .18s}
+.h-btn-p:hover{background:var(--pm)}
+.h-btn-s{display:inline-flex;align-items:center;gap:8px;padding:14px 28px;background:transparent;color:var(--pd);border-radius:12px;font-size:15px;font-weight:700;border:2px solid var(--border);cursor:pointer;font-family:inherit;transition:all .18s}
+.h-btn-s:hover{border-color:var(--pm);color:var(--pm)}
+
+/* SECTION */
+.sec{max-width:1080px;margin:0 auto;padding:0 32px 80px}
+.sec-ttl{font-size:11.5px;font-weight:800;letter-spacing:.14em;text-transform:uppercase;color:var(--text3);margin-bottom:28px;text-align:center}
+
+/* FEAT GRID */
+.fg{display:grid;grid-template-columns:repeat(3,1fr);gap:14px}
+.fc{background:#fff;border:1.5px solid var(--border);border-radius:16px;padding:22px 20px;cursor:pointer;transition:all .18s;position:relative;overflow:hidden;text-align:left}
+.fc:hover{border-color:var(--pm);box-shadow:0 8px 32px rgba(46,126,170,.14);transform:translateY(-3px)}
+.fc:hover .fc-arr{opacity:1;transform:translate(0,0)}
+.fc:active{transform:translateY(-1px)}
+.fc-arr{position:absolute;top:16px;right:16px;color:var(--pm);font-size:17px;font-weight:800;opacity:0;transform:translate(-5px,-5px);transition:all .18s}
+.fi{width:44px;height:44px;margin-bottom:11px;color:var(--pd)}
+.fi svg{display:block}
+.fn{font-size:14px;font-weight:800;color:var(--pd);margin-bottom:6px}
+.ft{font-size:12.5px;color:var(--text2);line-height:1.6}
+
+/* MODAL */
+.mo{position:fixed;inset:0;background:rgba(15,46,69,.42);z-index:300;display:flex;align-items:center;justify-content:center;padding:20px;opacity:0;pointer-events:none;transition:opacity .2s}
+.mo.on{opacity:1;pointer-events:all}
+.mm{background:#fff;border-radius:20px;max-width:520px;width:100%;padding:34px;box-shadow:0 24px 64px rgba(15,46,69,.22);transform:scale(.95) translateY(10px);transition:transform .22s;max-height:88vh;overflow-y:auto;position:relative}
+.mo.on .mm{transform:scale(1) translateY(0)}
+.mm-x{position:absolute;top:18px;right:18px;width:32px;height:32px;border-radius:8px;background:var(--pl);color:var(--text2);border:none;font-size:18px;font-weight:700;cursor:pointer;display:flex;align-items:center;justify-content:center;font-family:inherit;transition:background .15s;line-height:1}
+.mm-x:hover{background:var(--border)}
+.mm-ico{width:64px;height:64px;margin-bottom:14px;color:var(--pd)}
+.mm-ico svg{display:block}
+.mm-title{font-size:22px;font-weight:900;color:var(--pd);margin-bottom:6px}
+.mm-sub{font-size:12px;font-weight:800;letter-spacing:.08em;text-transform:uppercase;color:var(--pm);margin-bottom:18px}
+.mm-desc{font-size:14px;color:var(--text2);line-height:1.75;margin-bottom:14px}
+.mm-list{display:flex;flex-direction:column;gap:7px}
+.mm-list li{display:flex;align-items:flex-start;gap:9px;font-size:13.5px;color:var(--text2);list-style:none;line-height:1.55}
+.mm-list li::before{content:'✓';color:var(--pm);font-weight:900;flex-shrink:0;font-size:13px;margin-top:1px}
+.mm-close{margin-top:22px;width:100%;padding:12px;background:var(--pd);color:#fff;border:none;border-radius:10px;font-size:14px;font-weight:700;cursor:pointer;font-family:inherit;transition:background .15s}
+.mm-close:hover{background:var(--pm)}
+
+/* FOOTER */
+footer{text-align:center;padding:28px 20px;font-size:12px;color:var(--text3);border-top:1px solid var(--border);background:rgba(255,255,255,.6)}
+
+/* HELPERS */
+.desktop-only{display:flex}
+.mobile-only{display:none}
+@media(max-width:700px){
+  .desktop-only{display:none!important}
+  .mobile-only{display:flex!important}
+}
+@media(max-width:900px){.fg{grid-template-columns:repeat(2,1fr)}}
+@media(max-width:580px){
+  .fg{grid-template-columns:1fr}
+  .h-title{font-size:36px}
+  nav{padding:0 16px}
+  .hero{padding:96px 16px 56px}
+  .sec{padding:0 16px 56px}
+  .rp{width:100vw}
 }
 </style>
 </head>
 <body>
-<div class="hero">
-  <div class="logo">AZELA</div>
-  <div class="tagline">Kiçik və orta biznes üçün anbar, satış və müştəri idarəetmə sistemi</div>
 
-  <div class="cards">
-    <div class="card pro">
-      <div class="badge pro">Pro</div>
-      <div class="card-name">AZELA Pro</div>
-      <div class="card-desc">Admin panel + Kassa — iki pəncərə, bir data.</div>
-      <ul class="feats">
-        <li>Admin Panel — tam idarəetmə</li>
-        <li>Kassa rejimi — sürətli satış</li>
-        <li>Şirkət bölməsi — tam idarəetmə</li>
-        <li>Avtomatik yedəkləmə</li>
-      </ul>
-      <a href="https://github.com/mamedovorxan1989-alt/azela-pro-releases/releases/download/v4.5.80/AZELAPro-Setup-4.5.80.exe" class="btn pro">
-        ⬇️ Windows üçün yüklə
-      </a>
-      <div class="ver">Versiya 4.5.80</div>
-    </div>
+<!-- NAV -->
+<nav>
+  <div class="n-logo">AZELA<span>·</span></div>
+  <button class="n-dl" onclick="openRP()">
+    <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+    Yüklə / Lahiyələr
+  </button>
+</nav>
 
-    <div class="card apk">
-      <div class="badge apk">Yeni · Müştəri Tətbiqi</div>
-      <div class="card-name">AZELA Pro APK</div>
-      <div class="card-desc">Müştərilər öz telefonda borcu, alışları və məhsul qiymətlərini görür. Admin panellə real vaxtda əlaqəli.</div>
-      <ul class="feats apk">
-        <li>Gmail ilə giriş — yalnız öz məlumatları</li>
-        <li>Cari borc və alış tarixçəsi</li>
-        <li>Stokdakı məhsullar və qiymətlər</li>
-        <li>Admin panellə sinxronizasiya (tezliklə)</li>
-      </ul>
-      <a href="https://github.com/mamedovorxan1989-alt/azela-customer-apk/releases/download/v2.0.7/AZELA-Customer-v2.0.7.apk" class="btn apk">
-        ⬇️ Android üçün yüklə
-      </a>
-      <div class="ver">Versiya 2.0.7</div>
+<!-- PANEL OVERLAY -->
+<div class="ov" id="ov" onclick="closeRP()"></div>
+<div class="rp" id="rp">
+  <div class="rp-h">
+    <div class="rp-ht">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="16.5" y1="9.4" x2="7.5" y2="4.21"/><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/><polyline points="3.27 6.96 12 12.01 20.73 6.96"/><line x1="12" y1="22.08" x2="12" y2="12"/></svg>
+      Lahiyələr &amp; Yükləmə
     </div>
+    <button class="rp-x" onclick="closeRP()">×</button>
   </div>
+  <div class="rp-b">
 
-  <div class="req">Windows 10 / 11 · 64-bit</div>
-
-  <!-- Features -->
-  <div class="features">
-    <div class="features-title">Nə edə bilərsiniz</div>
-
-    <div class="feat-grid">
-      <div class="feat-item">
-        <div class="feat-icon">🧾</div>
-        <div class="feat-name">Alış Qaimələri</div>
-        <div class="feat-text">Alış qaimələrini daxil edin, stok avtomatik yenilənsin. Tarixçə, axtarış, silmə.</div>
+    <!-- AZELA Pro (Windows) -->
+    <div class="dlc">
+      <div class="dlc-h">
+        <div class="dlc-ico" style="background:#e4eff6">
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="var(--pd)" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="3" width="20" height="14" rx="2"/><line x1="8" y1="21" x2="16" y2="21"/><line x1="12" y1="17" x2="12" y2="21"/></svg>
+        </div>
+        <div>
+          <div class="dlc-name">AZELA Pro</div>
+          <div class="dlc-sub">Windows masaüstü · Admin + Kassa</div>
+        </div>
       </div>
-      <div class="feat-item">
-        <div class="feat-icon">💰</div>
-        <div class="feat-name">Satış və Kassa</div>
-        <div class="feat-text">Sürətli satış, nisyə, nağd, kartla ödəniş. Kassa pəncərəsi ayrıca açılır.</div>
+      <div class="dlc-desc">Tam idarəetmə sistemi — anbar, satış, müştəri, hesabat. Admin panel + Kassa pəncərəsi paralel işləyir.</div>
+      <a href="https://github.com/mamedovorxan1989-alt/azela-pro-releases/releases/download/v4.5.27/AZELAPro-Setup-4.5.27.exe"
+         class="dl-btn win desktop-only">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+        Windows üçün yüklə (.exe)
+      </a>
+      <div class="dl-mob mobile-only">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="var(--text2)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="3" width="20" height="14" rx="2"/><line x1="8" y1="21" x2="16" y2="21"/><line x1="12" y1="17" x2="12" y2="21"/></svg>
+        Bu proqram yalnız Windows kompüteri üçündür
       </div>
-      <div class="feat-item">
-        <div class="feat-icon">👥</div>
-        <div class="feat-name">Müştəri İdarəetməsi</div>
-        <div class="feat-text">Hər müştərinin borcu, alış tarixçəsi, ödəniş qeydləri. Borca görə sıralama.</div>
-      </div>
-      <div class="feat-item">
-        <div class="feat-icon">📦</div>
-        <div class="feat-name">Anbar və Stok</div>
-        <div class="feat-text">Məhsul qalığı, giriş-çıxış hərəkəti, stok xəbərdarlığı. Mal tarifləri siyahısı.</div>
-      </div>
-      <div class="feat-item">
-        <div class="feat-icon">📊</div>
-        <div class="feat-name">Qazanc Hesabatları</div>
-        <div class="feat-text">Mala görə, müştəriyə görə, satışa görə xalis qazanc. Marja, medal sistemi.</div>
-      </div>
-      <div class="feat-item">
-        <div class="feat-icon">🔄</div>
-        <div class="feat-name">İadə və Əvəz</div>
-        <div class="feat-text">Mal iadəsi və əvəz satışları ayrıca izlənir, hesabatlara düzgün əks olunur.</div>
-      </div>
-      <div class="feat-item">
-        <div class="feat-icon">🏢</div>
-        <div class="feat-name">Şirkət Bölməsi</div>
-        <div class="feat-text">Şirkət xərcləri, gəlirləri və ümumi maliyyə vəziyyəti bir yerdə.</div>
-      </div>
-      <div class="feat-item">
-        <div class="feat-icon">📱</div>
-        <div class="feat-name">Müştəri Tətbiqi</div>
-        <div class="feat-text">Müştəri Android telefondan öz borcunu, alışlarını və məhsul qiymətlərini görür.</div>
-      </div>
-      <div class="feat-item">
-        <div class="feat-icon">💾</div>
-        <div class="feat-name">Offline · Yerli Data</div>
-        <div class="feat-text">İnternet olmadan işləyir. Bütün məlumat kompüterinizdə saxlanılır, avtomatik yedəklənir.</div>
-      </div>
+      <div class="dl-ver">v4.5.27 · Windows 10 / 11 · 64-bit</div>
     </div>
 
-    <div class="divider"></div>
-
-    <div class="about">
-      <b>AZELA Pro</b> — ticarət, anbar və müştəri idarəetməsini bir yerdə birləşdirən <b>Windows masa üstü proqramı</b>dır. Alış qaimələrindən satışa, stok hərəkətindən qazanc hesabatına qədər bütün iş axını tək proqramda həll olunur. <b>Kassa pəncərəsi</b> paralel açılır, eyni anda həm idarəetmə həm də satış mümkündür. Məlumatlar yalnız sizin kompüterinizdə saxlanılır — internet asılılığı yoxdur.
+    <!-- AZELA Pro APK -->
+    <div class="dlc">
+      <div class="dlc-h">
+        <div class="dlc-ico" style="background:#e2f4ed">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#1a7a4e" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="5" y="2" width="14" height="20" rx="2" ry="2"/><line x1="12" y1="18" x2="12.01" y2="18" stroke-width="2.5"/></svg>
+        </div>
+        <div>
+          <div class="dlc-name">AZELA Pro APK</div>
+          <div class="dlc-sub">Android · Müştəri tətbiqi</div>
+        </div>
+      </div>
+      <div class="dlc-desc">Müştərilər telefondan öz borcunu, alışlarını və məhsul qiymətlərini görür. Gmail ilə giriş.</div>
+      <a href="/AZELA-Customer-v2.1.0.apk" class="dl-btn apk">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+        Android üçün yüklə (.apk)
+      </a>
+      <div class="dl-ver">v2.1.0 · com.azela.customer · Android 7+</div>
     </div>
+
+    <!-- AZELA Müştəri -->
+    <div class="dlc">
+      <div class="dlc-h">
+        <div class="dlc-ico" style="background:#e4eff6">
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="var(--pd)" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+        </div>
+        <div>
+          <div class="dlc-name">AZELA Müştəri</div>
+          <div class="dlc-sub">Müştəri tətbiqləri</div>
+        </div>
+      </div>
+      <div class="dlc-desc">Müştərilər üçün hazırlanmış tətbiq toplusu. Borc, alış tarixçəsi, bonus balansı, məhsul siyahısı.</div>
+      <a href="customer.html" class="dl-btn cust">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg>
+        Müştəri portalına keç
+      </a>
+      <div class="dl-ver">AZELA Customer Portal</div>
+    </div>
+
   </div>
-
-  <div class="footer">© 2026 AZELA. Bütün hüquqlar qorunur.</div>
 </div>
+
+<!-- HERO -->
+<div class="hero">
+  <div class="h-badge">
+    <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/></svg>
+    Kiçik və orta biznes üçün
+  </div>
+  <h1 class="h-title">Biznesinizi <span>AZELA</span> ilə<br>idarə edin</h1>
+  <p class="h-sub">Anbar, satış, müştəri idarəetməsi və hesabatları tək bir proqramda birləşdirin. Tam offline, bütün məlumatlar sizin kompüterinizdə.</p>
+  <div class="h-btns">
+    <button class="h-btn-p" onclick="openRP()">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+      Yüklə — v4.5.27
+    </button>
+    <button class="h-btn-s" onclick="document.querySelector('.sec').scrollIntoView({behavior:'smooth'})">
+      Xüsusiyyətlərə bax ↓
+    </button>
+  </div>
+</div>
+
+<!-- FEATURES -->
+<div class="sec">
+  <div class="sec-ttl">Nə edə bilərsiniz</div>
+  <div class="fg" id="fg"></div>
+</div>
+
+<!-- FEATURE MODAL -->
+<div class="mo" id="mo" onclick="if(event.target===this)closeF()">
+  <div class="mm">
+    <button class="mm-x" onclick="closeF()">×</button>
+    <div class="mm-ico" id="mIco"></div>
+    <div class="mm-title" id="mTtl"></div>
+    <div class="mm-sub" id="mSub"></div>
+    <div class="mm-desc" id="mDesc"></div>
+    <ul class="mm-list" id="mList"></ul>
+    <button class="mm-close" onclick="closeF()">Bağla</button>
+  </div>
+</div>
+
+<footer>© 2026 AZELA. Bütün hüquqlar qorunur.</footer>
+
+<script>
+function openRP(){document.getElementById('ov').classList.add('on');document.getElementById('rp').classList.add('on');document.body.style.overflow='hidden'}
+function closeRP(){document.getElementById('ov').classList.remove('on');document.getElementById('rp').classList.remove('on');document.body.style.overflow=''}
+
+const IC = [
+  // 0 Alış Qaimələri — file-text
+  `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" style="width:100%;height:100%"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/><line x1="10" y1="9" x2="8" y2="9"/></svg>`,
+  // 1 Satış və Kassa — shopping-cart
+  `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" style="width:100%;height:100%"><circle cx="9" cy="21" r="1"/><circle cx="20" cy="21" r="1"/><path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"/></svg>`,
+  // 2 Müştəri İdarəetməsi — users
+  `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" style="width:100%;height:100%"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>`,
+  // 3 Anbar və Stok — package
+  `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" style="width:100%;height:100%"><line x1="16.5" y1="9.4" x2="7.5" y2="4.21"/><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/><polyline points="3.27 6.96 12 12.01 20.73 6.96"/><line x1="12" y1="22.08" x2="12" y2="12"/></svg>`,
+  // 4 Qazanc Hesabatları — bar-chart
+  `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" style="width:100%;height:100%"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/><line x1="2" y1="20" x2="22" y2="20"/></svg>`,
+  // 5 İadə və Əvəz — refresh-cw
+  `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" style="width:100%;height:100%"><polyline points="1 4 1 10 7 10"/><polyline points="23 20 23 14 17 14"/><path d="M20.49 9A9 9 0 0 0 5.64 5.64L1 10m22 4l-4.64 4.36A9 9 0 0 1 3.51 15"/></svg>`,
+  // 6 Şirkət Bölməsi — building
+  `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" style="width:100%;height:100%"><path d="M6 22V4a2 2 0 0 1 2-2h8a2 2 0 0 1 2 2v18Z"/><path d="M6 12H4a2 2 0 0 0-2 2v6a2 2 0 0 0 2 2h2"/><path d="M18 9h2a2 2 0 0 1 2 2v9a2 2 0 0 1-2 2h-2"/><line x1="10" y1="6" x2="14" y2="6"/><line x1="10" y1="10" x2="14" y2="10"/><line x1="10" y1="14" x2="14" y2="14"/><line x1="10" y1="18" x2="14" y2="18"/></svg>`,
+  // 7 Müştəri Tətbiqi — smartphone
+  `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" style="width:100%;height:100%"><rect x="5" y="2" width="14" height="20" rx="2" ry="2"/><line x1="12" y1="18" x2="12.01" y2="18" stroke-width="2.5"/></svg>`,
+  // 8 Offline · Yerli Data — database
+  `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" style="width:100%;height:100%"><ellipse cx="12" cy="5" rx="9" ry="3"/><path d="M21 12c0 1.66-4 3-9 3s-9-1.34-9-3"/><path d="M3 5v14c0 1.66 4 3 9 3s9-1.34 9-3V5"/></svg>`,
+];
+
+const FD=[
+  {ttl:'Alış Qaimələri',sub:'Alış · Stok · Tarixçə',
+   desc:'Təchizatçıdan alınan malları sistem vasitəsilə qeyd edin. Stok avtomatik olaraq yenilənir.',
+   list:['Qaimə nömrəsi, tarix, təchizatçı seçimi ilə tam qeyd','Hər sətir üçün: mal adı, miqdar, alış qiyməti, satış qiyməti','Stok avtomatik yenilənir — əl ilə bir şey etmək lazım deyil','Tarixçəni tarixə, təchizatçıya, mala görə filtrləyin','Barkod oxuyucu ilə dəstək — malı saniyədə tapın','Qaiməni çap et, CSV-yə ixrac et','Yanlış qaiməni asanlıqla silmək mümkündür']},
+  {ttl:'Satış və Kassa',sub:'Sürətli satış · Ödəniş növləri · Çek',
+   desc:'Kassir rejimində sürətli və rahat satış həyata keçirin. Kassa pəncərəsi Admin paneldən ayrıca açılır.',
+   list:['Nağd, nisyə, kart — 3 ödəniş növü','Kassa pəncərəsi ayrıca açılır — eyni anda 2 əməliyyat mümkündür','Barkod oxuyucu — malı saniyələr içində əlavə et','Müştəri seçin — nisyə satışda borc avtomatik artır','Endirim tətbiq et — faizlə və ya məbləğlə','Satış çeki çap et','Kassa hesabatı — gündəlik, aylıq dövriyyə']},
+  {ttl:'Müştəri İdarəetməsi',sub:'Borc · Tarixçə · Ödənişlər',
+   desc:'Hər müştərinin tam profilini bir yerdə idarə edin. Borclar, ödənişlər, alış tarixi — hamısı görünür.',
+   list:['Cari borc məbləği — nə qədər ödədi, nə qədər qaldı','Alış tarixçəsi — hər əməliyyatın detalları','Ödəniş qeydləri — tarix, məbləğ, qeyd','Borcuna görə müştəriləri sıralayın','Xüsusi qiymət qrupuna əlavə et','Müştəri məlumatlarını çap et, ixrac et','Silinmiş müştərinin tarixçəsi saxlanılır']},
+  {ttl:'Anbar və Stok',sub:'Mal qalığı · Hərəkət · Xəbərdarlıq',
+   desc:'Mallarınızın hər an cari vəziyyətini real vaxtda izləyin. Heç bir mal itib-batmaz.',
+   list:['Hər malın cari qalığı real vaxtda göstərilir','Giriş-çıxış hərəkət tarixçəsi — nə gəldi, nə getdi','Kritik stok xəbərdarlığı — həddin altına düşəndə bildiriş','Mal tarifləri siyahısı — alış, satış, marja faizi','Qrup və kateqoriya üzrə filtrləmə','Barkod üzrə axtarış','Stok hesabatını çap et, ixrac et']},
+  {ttl:'Qazanc Hesabatları',sub:'Mala · Müştəriyə · Satışa görə',
+   desc:'Biznesinizin real gəlirlilik mənzərəsini görün. Hansı mal qazandırır, hansı müştəri sərfəlidir.',
+   list:['Mala görə qazanc — hansı mal daha çox qazandırır','Müştəriyə görə qazanc — ən sərfəli müştərilər','Satışa görə qazanc — hər əməliyyatın xalis mənfəəti','Qazanc marjası faizi avtomatik hesablanır','Dövr seçimi: bu gün, bu ay, keçən ay, bu il','Medal sistemi — ən çox satan mallara xüsusi nişan','Hesabatı çap et, CSV-yə ixrac et']},
+  {ttl:'İadə və Əvəz',sub:'İadə · Əvəz satış · Düzgün hesabat',
+   desc:'Mal iadəsi və əvəz satışlarını düzgün idarə edin. Qazanc hesabatları heç vaxt təhrif olmaz.',
+   list:['Müştərinin geri qaytardığı malı sistem vasitəsilə qeyd et','Stok avtomatik artır, müştəri borcu azalır','Əvəz satışı — müştəri mal dəyişdirmək istədikdə','Bütün iadələr qazanc hesabatlarına düzgün əks olunur','Tarixçəni ayrıca filtrləmək mümkündür','Yanlış iadəni silmək mümkündür']},
+  {ttl:'Şirkət Bölməsi',sub:'Maliyyə · Kassir · Xərclər',
+   desc:'Şirkətin ümumi maliyyə vəziyyətini tək yerdə idarə edin. 7 ayrı tab ilə tam nəzarət.',
+   list:['Şirkət xərclərini kateqoriya üzrə qeyd et','Şirkət gəlirlərini izlə','Kassir hesabları — hər kassirin öz girişi və hesabatı','Daxili transfer qeydləri','Ümumi balans — gəlir, xərc, xalis qalıq','Şirkət daxilindəki alqı-satqı əməliyyatları','Maliyyə hesabatını çap et']},
+  {ttl:'Müştəri Tətbiqi',sub:'Android · Gmail giriş · Real vaxt',
+   desc:'Müştəriyə öz telefonundan hesabına baxmaq imkanı verin. Heç bir izahat lazım deyil.',
+   list:['Android tətbiqi — APK ilə asanlıqla quraşdırılır','Gmail hesabı ilə giriş — yalnız öz məlumatlarını görür','Cari borc məbləği anlıq göstərilir','Bütün alış tarixçəsi — tarix, məbləğ, ödəniş detalları','Stokdakı məhsullar və aktual qiymətlər','Bonus balansı (aktivdirsə)','Admin paneldəki dəyişikliklər dərhal müştəriyə əks olunur']},
+  {ttl:'Offline · Yerli Data',sub:'İnternetsiz · Güvənli · Avtoyedək',
+   desc:'Bütün məlumatlarınız tam sizin nəzarətinizdədir. İnternet kəsildikdə proqram işləməyə davam edir.',
+   list:['İnternet olmadan tamamilə işləyir','Bütün məlumatlar yalnız sizin kompüterinizdə saxlanılır','Heç bir bulud serverinə yüklənmir — tam məxfilik','Avtomatik fayl yedəkləməsi — hər dəfə proqram bağlananda','Yedəyin yerini özünüz seçə bilərsiniz','Məlumatları başqa kompüterə köçürmək asandır','SQLite — etibarlı, sürətli, kompakt verilənlər bazası']}
+];
+
+// Render feature cards
+const fg=document.getElementById('fg');
+FD.forEach((f,i)=>{
+  fg.innerHTML+=`<div class="fc" onclick="openF(${i})"><div class="fc-arr">›</div><div class="fi">${IC[i]}</div><div class="fn">${f.ttl}</div><div class="ft">${f.sub}</div></div>`;
+});
+
+function openF(i){
+  const f=FD[i];
+  document.getElementById('mIco').innerHTML=IC[i];
+  document.getElementById('mTtl').textContent=f.ttl;
+  document.getElementById('mSub').textContent=f.sub;
+  document.getElementById('mDesc').textContent=f.desc;
+  document.getElementById('mList').innerHTML=f.list.map(l=>`<li>${l}</li>`).join('');
+  document.getElementById('mo').classList.add('on');
+  document.body.style.overflow='hidden';
+}
+function closeF(){
+  document.getElementById('mo').classList.remove('on');
+  document.body.style.overflow='';
+}
+document.addEventListener('keydown',e=>{if(e.key==='Escape'){closeF();closeRP();}});
+</script>
 </body>
 </html>
