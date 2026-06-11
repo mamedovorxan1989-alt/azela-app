@@ -4,6 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
 <title>AZELA — Müştəri</title>
+<script src="https://cdn.jsdelivr.net/npm/jsqr@1.4.0/dist/jsQR.min.js"></script>
 <style>
 *{box-sizing:border-box;margin:0;padding:0;}
 body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;background:#f1f5f9;min-height:100vh;display:flex;justify-content:center;}
@@ -114,18 +115,37 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;backgrou
   <div class="login-logo">AZELA</div><div class="login-sub">MÜŞTƏRİ PANELİ</div>
   <div class="login-card">
     <div class="login-title">Quraşdırma</div>
-    <div class="login-desc" style="margin-bottom:20px">Admindən aldığınız iki kodu daxil edin</div>
+    <div class="login-desc" style="margin-bottom:16px">Admindən aldığınız iki kodu daxil edin</div>
+    <button onclick="openQrScanner()" style="width:100%;padding:13px;border-radius:12px;background:rgba(139,92,246,0.3);border:1.5px solid rgba(139,92,246,0.6);font-size:14px;font-weight:700;color:#fff;cursor:pointer;font-family:inherit;margin-bottom:16px;display:flex;align-items:center;justify-content:center;gap:8px">
+      QR kod ilə daxil ol
+    </button>
     <div style="font-size:11px;font-weight:700;color:#a78bfa;text-transform:uppercase;letter-spacing:.5px;margin-bottom:6px;text-align:left">Kod 1 (Server)</div>
-    <input id="setupCode1" type="text" placeholder="https://xxx.supabase.co"
+    <input id="setupCode1" type="password" placeholder="••••••••••••"
       style="width:100%;padding:13px 14px;border-radius:12px;border:1.5px solid rgba(255,255,255,0.2);background:rgba(255,255,255,0.1);color:#fff;font-size:13px;font-family:monospace;outline:none;margin-bottom:12px;box-sizing:border-box"
       onfocus="this.style.borderColor='#a78bfa'" onblur="this.style.borderColor='rgba(255,255,255,0.2)'">
     <div style="font-size:11px;font-weight:700;color:#a78bfa;text-transform:uppercase;letter-spacing:.5px;margin-bottom:6px;text-align:left">Kod 2 (Açar)</div>
-    <input id="setupCode2" type="text" placeholder="eyJhbGci..."
+    <input id="setupCode2" type="password" placeholder="••••••••••••"
       style="width:100%;padding:13px 14px;border-radius:12px;border:1.5px solid rgba(255,255,255,0.2);background:rgba(255,255,255,0.1);color:#fff;font-size:13px;font-family:monospace;outline:none;margin-bottom:12px;box-sizing:border-box"
       onfocus="this.style.borderColor='#a78bfa'" onblur="this.style.borderColor='rgba(255,255,255,0.2)'">
     <div id="setupErr" style="font-size:12px;color:#f87171;margin-bottom:10px;min-height:18px;text-align:center"></div>
     <button onclick="doSetup()" style="width:100%;padding:14px;border-radius:14px;background:linear-gradient(135deg,#7c3aed,#6d28d9);border:none;font-size:15px;font-weight:700;color:#fff;cursor:pointer;font-family:inherit">Quraşdır</button>
   </div>
+</div>
+
+<!-- QR SCANNER -->
+<div id="qrOverlay" style="display:none;position:fixed;inset:0;background:#000;z-index:9999;flex-direction:column;align-items:center;justify-content:center">
+  <div style="color:#fff;font-size:16px;font-weight:700;margin-bottom:16px">QR kodu kameraya yönəlt</div>
+  <div style="position:relative;width:280px;height:280px;border-radius:16px;overflow:hidden">
+    <video id="qrVideo" style="width:100%;height:100%;object-fit:cover" playsinline autoplay muted></video>
+    <canvas id="qrScanCanvas" style="display:none"></canvas>
+    <div style="position:absolute;inset:0;border:3px solid #8b5cf6;border-radius:16px;pointer-events:none"></div>
+    <div style="position:absolute;top:0;left:0;width:40px;height:40px;border-top:4px solid #a78bfa;border-left:4px solid #a78bfa;border-radius:12px 0 0 0"></div>
+    <div style="position:absolute;top:0;right:0;width:40px;height:40px;border-top:4px solid #a78bfa;border-right:4px solid #a78bfa;border-radius:0 12px 0 0"></div>
+    <div style="position:absolute;bottom:0;left:0;width:40px;height:40px;border-bottom:4px solid #a78bfa;border-left:4px solid #a78bfa;border-radius:0 0 0 12px"></div>
+    <div style="position:absolute;bottom:0;right:0;width:40px;height:40px;border-bottom:4px solid #a78bfa;border-right:4px solid #a78bfa;border-radius:0 0 12px 0"></div>
+  </div>
+  <div style="color:#a78bfa;font-size:13px;margin-top:16px">Admin paneldəki QR kodu oxudun</div>
+  <button onclick="closeQrScanner()" style="margin-top:24px;padding:12px 32px;border-radius:12px;background:rgba(255,255,255,0.15);border:1px solid rgba(255,255,255,0.3);color:#fff;font-size:14px;font-weight:700;cursor:pointer;font-family:inherit">Ləğv et</button>
 </div>
 
 <!-- LOGIN -->
@@ -317,6 +337,53 @@ const SB_URL=_rawSbUrl, SB_KEY=_rawSbKey;
 })();
 
 function resetSetup(){localStorage.removeItem('azela_sb_cfg');location.reload();}
+
+// ── QR SCANNER ──
+let _qrStream = null, _qrTimer = null;
+function openQrScanner() {
+  const ov = document.getElementById('qrOverlay');
+  ov.style.display = 'flex';
+  const video = document.getElementById('qrVideo');
+  navigator.mediaDevices.getUserMedia({ video: { facingMode: 'environment' } })
+    .then(function(stream) {
+      _qrStream = stream;
+      video.srcObject = stream;
+      video.play();
+      _qrTimer = setInterval(_qrScanFrame, 300);
+    })
+    .catch(function() {
+      document.getElementById('qrOverlay').style.display = 'none';
+      alert('Kamera icazəsi verilmədi');
+    });
+}
+function closeQrScanner() {
+  clearInterval(_qrTimer); _qrTimer = null;
+  if (_qrStream) { _qrStream.getTracks().forEach(function(t){ t.stop(); }); _qrStream = null; }
+  document.getElementById('qrOverlay').style.display = 'none';
+}
+function _qrScanFrame() {
+  const video = document.getElementById('qrVideo');
+  if (video.readyState !== video.HAVE_ENOUGH_DATA) return;
+  const canvas = document.getElementById('qrScanCanvas');
+  canvas.width = video.videoWidth;
+  canvas.height = video.videoHeight;
+  const ctx = canvas.getContext('2d');
+  ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
+  const imageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
+  if (typeof jsQR === 'undefined') return;
+  const code = jsQR(imageData.data, imageData.width, imageData.height, { inversionAttempts: 'dontInvert' });
+  if (code && code.data) {
+    try {
+      const parsed = JSON.parse(code.data);
+      if (parsed.url && parsed.key) {
+        document.getElementById('setupCode1').value = parsed.url;
+        document.getElementById('setupCode2').value = parsed.key;
+        closeQrScanner();
+      }
+    } catch(_) {}
+  }
+}
+
 function doSetup(){
   const sb=(document.getElementById('setupCode1')?.value||'').trim().replace(/\/$/,'');
   const sbk=(document.getElementById('setupCode2')?.value||'').trim();
@@ -350,7 +417,7 @@ function switchTab(name,el){
     loadOpsData();
     setTimeout(_redrawCharts,50);
     _opsTimer=setInterval(loadOpsData,30000);
-  } else if(name==='purch'||name==='pay'){
+  } else if(name==='purch'||name==='pay'||name==='prods'||name==='bonus'){
     loadOpsData();
     _opsTimer=setInterval(loadOpsData,30000);
   }
@@ -538,34 +605,29 @@ function _renderPurchases(sales){
   const el=document.getElementById('purchList');
   if(!el) return;
   if(!sales||!sales.length){el.innerHTML='<div class="empty">Bu dövr üçün alış yoxdur</div>';return;}
-  el.innerHTML=sales.map(s=>{
-    const items=(()=>{try{return JSON.parse(s.items_json||'[]');}catch{return[];}})();
+  const FATURA_LABEL={nagd:'Satış faturası',nisye:'Satış faturası',qismen:'Satış faturası',evaz:'Əvəzetmə faturası',qaytarma:'İadə faturası'};
+  el.innerHTML=sales.map((s,i)=>{
     const pt=s.payment_type||'nisye';
-    const isRet=pt==='qaytarma',isEvaz=pt==='evaz';
-    const debt=s.debt||0;
-    const dateStr=(s.date||'').slice(0,16).replace('T',' ');
-    const borcHtml=(!isRet&&!isEvaz)?`
-      <div style="flex-shrink:0;text-align:right;min-width:54px;padding-top:7px;border-top:1px solid #f1f5f9">
-        <div style="font-size:10px;font-weight:700;color:#94a3b8;text-transform:uppercase;letter-spacing:.3px;margin-bottom:3px">Borc</div>
-        <div style="font-size:14px;font-weight:800;color:${debt>0?'#dc2626':'#16a34a'}">${debt>0?debt.toFixed(2)+' ₼':'✓'}</div>
-      </div>`:'';
-    const itemsHtml=items.map(it=>`
-      <div class="purch-item">
-        <div><div class="purch-item-name">${it.name||'—'}</div>${!isEvaz?`<div class="purch-item-qty">${it.qty||1} ədəd</div>`:''}</div>
-        ${!isEvaz?`<div style="font-size:13px;font-weight:700;color:${isRet?'#0f766e':'#7c3aed'}">${isRet?'-':''}${((it.qty||1)*(it.sellPrice||0)).toFixed(2)} ₼</div>`:''}
-      </div>`).join('');
-    const totalHtml=(!isEvaz&&items.length)?`<div class="purch-total" style="margin-top:6px">
-      <span style="font-size:13px;color:#64748b">Cəmi</span>
-      <span style="font-size:14px;font-weight:800;color:${isRet?'#0f766e':'#1e293b'}">${isRet?'-':''}${(s.total||0).toFixed(2)} ₼</span></div>`:'';
-    return `<div class="purch-card" style="${isRet?'border-left:3px solid #0d9488;':''}">
-      <div class="purch-head">
-        <span class="purch-date">${dateStr}</span>
-        <span class="purch-badge ${PAY_CLS[pt]||'nisye'}">${PAY_LABEL[pt]||pt}</span>
+    const isRet=pt==='qaytarma';
+    const total=(s.total||0).toFixed(2);
+    const rawDate=(s.date||'').slice(0,10);
+    const [y,m,d]=rawDate.split('-');
+    const months=['','yanvar','fevral','mart','aprel','may','iyun','iyul','avqust','sentyabr','oktyabr','noyabr','dekabr'];
+    const dateStr=d&&m&&y?`${parseInt(d)} ${months[parseInt(m)||0]||''} ${y}`:(s.date||'').slice(0,10);
+    const saleId=(s.id||'—').toString().toUpperCase();
+    const isLast=i===sales.length-1;
+    return `<div style="display:flex;justify-content:space-between;align-items:flex-start;padding:16px 0;${isLast?'':'border-bottom:1px solid #f1f5f9'}">
+      <div style="flex:1;min-width:0">
+        <div style="font-size:15px;font-weight:700;color:#1e293b;margin-bottom:5px">${FATURA_LABEL[pt]||'Satış faturası'}</div>
+        <div style="font-size:13px;font-weight:600;color:#6366f1;margin-bottom:4px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${saleId}</div>
+        <div style="font-size:12px;color:#94a3b8">${dateStr}</div>
       </div>
-      <div style="display:flex;align-items:flex-end;justify-content:space-between;gap:8px">
-        <div style="flex:1;border-top:1px solid #f1f5f9;padding-top:7px">${itemsHtml}${totalHtml}</div>
-        ${borcHtml}
-      </div></div>`;
+      <div style="text-align:right;flex-shrink:0;margin-left:12px">
+        <div style="font-size:16px;font-weight:800;color:${isRet?'#0f766e':'#d97706'};margin-bottom:4px">${isRet?'-':''}${total} AZN</div>
+        <div style="font-size:12px;color:#94a3b8;margin-bottom:3px">+0.0 Bonus</div>
+        <div style="font-size:11px;color:#94a3b8">📋 Müştəri qeydi</div>
+      </div>
+    </div>`;
   }).join('');
 }
 
