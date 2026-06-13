@@ -1,0 +1,1072 @@
+<!DOCTYPE html>
+<html lang="az">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>AZELA Pro Go</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent;}
+body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;background:#f1f5f9;color:#1e293b;min-height:100vh;overscroll-behavior:none;}
+
+/* SCREENS */
+.screen{display:none;min-height:100vh;flex-direction:column;}
+.screen.active{display:flex;}
+
+/* HEADER */
+.hdr{background:#1e293b;color:#fff;padding:14px 16px;display:flex;align-items:center;gap:10px;position:sticky;top:0;z-index:100;flex-shrink:0;}
+.hdr-back{background:none;border:none;color:#fff;font-size:22px;cursor:pointer;padding:0 4px 0 0;line-height:1;}
+.hdr-title{font-size:16px;font-weight:700;flex:1;}
+.hdr-btn{background:none;border:none;color:#94a3b8;font-size:20px;cursor:pointer;padding:0;}
+
+/* SYNC BAR */
+.sync-bar{background:#0f172a;padding:4px 16px;display:flex;align-items:center;justify-content:space-between;flex-shrink:0;}
+.sync-dot{width:6px;height:6px;border-radius:50%;background:#4ade80;flex-shrink:0;transition:background .3s;}
+.sync-text{font-size:11px;color:#475569;margin-left:6px;flex:1;}
+.sync-cd{font-size:11px;color:#334155;font-weight:600;}
+
+/* SETUP SCREEN */
+.setup-wrap{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:32px 20px;}
+.setup-logo{font-size:32px;font-weight:900;color:#1e293b;letter-spacing:.08em;margin-bottom:4px;}
+.setup-sub{font-size:13px;color:#94a3b8;margin-bottom:32px;}
+.setup-card{background:#fff;border-radius:16px;padding:20px;width:100%;max-width:360px;box-shadow:0 4px 24px rgba(0,0,0,.08);}
+.setup-label{font-size:11px;font-weight:700;color:#64748b;text-transform:uppercase;letter-spacing:.5px;margin-bottom:6px;}
+.setup-inp{width:100%;padding:11px 14px;border:1.5px solid #e2e8f0;border-radius:10px;font-size:13px;font-family:inherit;outline:none;margin-bottom:14px;color:#1e293b;}
+.setup-inp:focus{border-color:#6366f1;}
+.setup-btn{width:100%;padding:13px;background:#6366f1;color:#fff;border:none;border-radius:12px;font-size:14px;font-weight:700;cursor:pointer;font-family:inherit;}
+.setup-btn:active{opacity:.85;}
+.setup-note{font-size:11px;color:#94a3b8;margin-top:12px;text-align:center;line-height:1.6;}
+
+/* PIN SCREEN */
+.pin-wrap{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;background:#1e293b;padding:40px 20px;}
+.pin-logo{font-size:24px;font-weight:900;color:#fff;letter-spacing:.08em;margin-bottom:4px;}
+.pin-sub{font-size:13px;color:#64748b;margin-bottom:32px;}
+.pin-dots{display:flex;gap:14px;margin-bottom:28px;}
+.pin-dot{width:16px;height:16px;border-radius:50%;border:2px solid #475569;transition:all .15s;}
+.pin-dot.filled{background:#6366f1;border-color:#6366f1;}
+.pin-dot.err{background:#ef4444;border-color:#ef4444;}
+.pin-pad{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;width:240px;}
+.pin-key{height:64px;border-radius:16px;background:#1e3a5f;border:none;color:#e2e8f0;font-size:22px;font-weight:700;cursor:pointer;font-family:inherit;}
+.pin-key:active{background:#2563eb;transform:scale(.94);}
+.pin-key.del{background:#0f2137;font-size:18px;}
+
+/* SUMMARY CARDS */
+.sum-cards{background:#1e293b;padding:0 16px 14px;display:flex;gap:10px;flex-shrink:0;}
+.sum-card{flex:1;background:rgba(255,255,255,.07);border-radius:12px;padding:10px 12px;cursor:pointer;transition:background .15s;}
+.sum-card:active{background:rgba(255,255,255,.14);}
+.sum-lbl{font-size:10px;color:#64748b;text-transform:uppercase;letter-spacing:.4px;margin-bottom:3px;}
+.sum-val{font-size:17px;font-weight:800;}
+.sum-hint{font-size:10px;color:#475569;margin-top:2px;}
+
+/* SEARCH */
+.search-wrap{padding:10px 14px;background:#fff;border-bottom:1px solid #e2e8f0;flex-shrink:0;}
+.search-inp{width:100%;padding:9px 14px;border:1.5px solid #e2e8f0;border-radius:10px;font-size:14px;font-family:inherit;outline:none;background:#f8fafc;}
+.search-inp:focus{border-color:#6366f1;}
+
+/* CUSTOMER LIST */
+.cust-list{flex:1;overflow-y:auto;padding:8px 12px;display:flex;flex-direction:column;gap:7px;}
+.cust-row{background:#fff;border-radius:12px;padding:13px 14px;display:flex;align-items:center;gap:11px;cursor:pointer;border:1.5px solid #f1f5f9;}
+.cust-row:active{background:#f8fafc;}
+.cust-av{width:42px;height:42px;border-radius:50%;background:linear-gradient(135deg,#6366f1,#8b5cf6);display:flex;align-items:center;justify-content:center;font-size:16px;font-weight:800;color:#fff;flex-shrink:0;}
+.cust-info{flex:1;min-width:0;}
+.cust-name{font-size:14px;font-weight:700;color:#1e293b;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.cust-phone{font-size:12px;color:#94a3b8;margin-top:1px;}
+.cust-debt-wrap{text-align:right;}
+.cust-debt-amt{font-size:15px;font-weight:800;color:#dc2626;}
+.cust-debt-amt.zero{color:#16a34a;}
+.cust-debt-lbl{font-size:10px;color:#94a3b8;margin-top:1px;}
+
+/* CARD HERO */
+.card-hero{background:linear-gradient(135deg,#1e293b,#312e81);padding:18px 16px 20px;color:#fff;flex-shrink:0;}
+.card-name{font-size:19px;font-weight:800;margin-bottom:2px;}
+.card-phone{font-size:13px;color:#94a3b8;margin-bottom:14px;}
+.card-stats{display:grid;grid-template-columns:1fr 1fr;gap:9px;}
+.card-stat{background:rgba(255,255,255,.08);border-radius:11px;padding:11px 13px;}
+.card-stat-lbl{font-size:10px;color:#94a3b8;text-transform:uppercase;letter-spacing:.4px;margin-bottom:3px;}
+.card-stat-val{font-size:19px;font-weight:800;}
+
+/* ACTION ROW */
+.action-row{display:flex;gap:9px;padding:11px 14px;background:#fff;border-bottom:1px solid #f1f5f9;flex-shrink:0;}
+.act-btn{flex:1;padding:11px;border:none;border-radius:11px;font-size:12px;font-weight:700;cursor:pointer;font-family:inherit;display:flex;flex-direction:column;align-items:center;gap:3px;}
+.act-btn .ico{font-size:20px;}
+.act-btn.pay{background:#dcfce7;color:#16a34a;}
+.act-btn.bonus{background:#fef3c7;color:#d97706;}
+
+/* ACCORDION */
+.acc-hdr{background:#fff;padding:13px 16px;display:flex;align-items:center;justify-content:space-between;cursor:pointer;border-bottom:1px solid #f1f5f9;user-select:none;flex-shrink:0;}
+.acc-hdr-left{display:flex;align-items:center;gap:7px;font-size:14px;font-weight:700;color:#1e293b;}
+.acc-arrow{font-size:11px;color:#94a3b8;transition:transform .2s;}
+.acc-arrow.open{transform:rotate(180deg);}
+.acc-body{display:none;}
+.acc-body.open{display:block;}
+.date-filter{display:flex;align-items:center;gap:6px;padding:9px 14px 5px;flex-wrap:wrap;}
+.date-inp{flex:1;min-width:100px;padding:6px 8px;border:1.5px solid #e2e8f0;border-radius:8px;font-size:12px;font-family:inherit;color:#334155;outline:none;}
+.date-clear{padding:6px 10px;border:1.5px solid #e2e8f0;border-radius:8px;font-size:11px;color:#94a3b8;background:#fff;cursor:pointer;font-family:inherit;white-space:nowrap;}
+
+/* LISTS */
+.list-wrap{padding:8px 12px;display:flex;flex-direction:column;gap:7px;}
+.sale-row{background:#fff;border-radius:11px;padding:11px 13px;border:1.5px solid #f1f5f9;}
+.sale-hdr{display:flex;justify-content:space-between;align-items:center;margin-bottom:7px;}
+.sale-date{font-size:12px;color:#94a3b8;}
+.sale-total{font-size:14px;font-weight:800;color:#1e293b;}
+.sale-item{display:flex;align-items:center;justify-content:space-between;padding:4px 0;border-bottom:1px solid #f8fafc;}
+.sale-item:last-child{border-bottom:none;}
+.sale-item-name{font-size:13px;color:#334155;}
+.sale-item-qty{font-size:12px;color:#94a3b8;margin-left:3px;}
+.pay-row{background:#fff;border-radius:11px;padding:12px 13px;display:flex;align-items:center;gap:11px;border:1.5px solid #f1f5f9;}
+.pay-ico{width:34px;height:34px;border-radius:50%;background:#dcfce7;display:flex;align-items:center;justify-content:center;font-size:15px;flex-shrink:0;}
+.pay-info{flex:1;}
+.pay-note{font-size:13px;font-weight:600;color:#334155;}
+.pay-date{font-size:11px;color:#94a3b8;margin-top:2px;}
+.pay-amt{font-size:14px;font-weight:800;color:#16a34a;}
+.empty-msg{text-align:center;padding:32px 20px;color:#94a3b8;font-size:13px;}
+
+/* MODAL */
+.modal-bg{position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:200;display:flex;align-items:flex-end;justify-content:center;}
+.modal-bg.hidden{display:none;}
+.modal{background:#fff;border-radius:20px 20px 0 0;width:100%;max-width:480px;padding:20px 20px 32px;max-height:80vh;overflow-y:auto;}
+.modal-title{font-size:16px;font-weight:800;color:#1e293b;margin-bottom:4px;}
+.modal-sub{font-size:12px;color:#94a3b8;margin-bottom:14px;}
+.modal-inp{width:100%;padding:12px 14px;border:1.5px solid #e2e8f0;border-radius:12px;font-size:16px;font-family:inherit;outline:none;margin-bottom:10px;}
+.modal-inp:focus{border-color:#6366f1;}
+.modal-row{display:flex;gap:9px;margin-top:4px;}
+.btn-cancel{flex:1;padding:13px;border:1.5px solid #e2e8f0;border-radius:12px;font-size:14px;font-weight:700;cursor:pointer;font-family:inherit;background:#fff;color:#64748b;}
+.btn-ok{flex:2;padding:13px;border:none;border-radius:12px;font-size:14px;font-weight:700;cursor:pointer;font-family:inherit;color:#fff;}
+.btn-ok.green{background:#16a34a;}
+.btn-ok.orange{background:#d97706;}
+.bonus-bal{background:#fef3c7;border-radius:10px;padding:10px 13px;margin-bottom:12px;display:flex;align-items:center;justify-content:space-between;}
+.use-all{width:100%;padding:7px;background:none;border:none;color:#6366f1;font-size:12px;font-weight:700;cursor:pointer;font-family:inherit;margin-bottom:6px;}
+
+/* SUMMARY MODAL */
+.sum-modal-row{display:flex;align-items:center;justify-content:space-between;padding:11px 0;border-bottom:1px solid #f1f5f9;cursor:pointer;}
+.sum-modal-row:last-child{border-bottom:none;}
+.sum-bar-wrap{margin-top:4px;}
+.sum-bar-bg{height:5px;background:#f1f5f9;border-radius:3px;overflow:hidden;margin-top:4px;}
+.sum-bar-fill{height:5px;background:linear-gradient(90deg,#ef4444,#f87171);border-radius:3px;transition:width .6s;}
+
+/* SETTINGS */
+.set-section{background:#fff;margin:10px 12px;border-radius:14px;overflow:hidden;}
+.set-row{display:flex;align-items:center;justify-content:space-between;padding:14px 16px;border-bottom:1px solid #f1f5f9;}
+.set-row:last-child{border-bottom:none;}
+.set-lbl{font-size:14px;color:#1e293b;font-weight:500;}
+.set-sub{font-size:11px;color:#94a3b8;margin-top:2px;}
+.toggle{width:44px;height:26px;border-radius:13px;background:#e2e8f0;position:relative;cursor:pointer;transition:background .2s;border:none;flex-shrink:0;}
+.toggle.on{background:#6366f1;}
+.toggle::after{content:'';width:20px;height:20px;border-radius:50%;background:#fff;position:absolute;top:3px;left:3px;transition:left .2s;box-shadow:0 1px 3px rgba(0,0,0,.2);}
+.toggle.on::after{left:21px;}
+.set-btn{padding:7px 14px;background:#eff6ff;border:1.5px solid #bfdbfe;border-radius:8px;font-size:12px;font-weight:700;color:#1d4ed8;cursor:pointer;font-family:inherit;}
+
+/* TOAST */
+.toast{position:fixed;top:70px;left:50%;transform:translateX(-50%);background:#1e293b;color:#fff;padding:9px 18px;border-radius:20px;font-size:13px;font-weight:600;z-index:300;opacity:0;transition:opacity .25s;white-space:nowrap;pointer-events:none;}
+.toast.show{opacity:1;}
+
+/* LOADING */
+.loader{display:flex;align-items:center;justify-content:center;padding:40px;color:#94a3b8;font-size:13px;gap:8px;}
+.spinner{width:16px;height:16px;border:2px solid #e2e8f0;border-top-color:#6366f1;border-radius:50%;animation:spin .7s linear infinite;}
+@keyframes spin{to{transform:rotate(360deg);}}
+
+@media(max-width:360px){.card-stats{grid-template-columns:1fr;}}
+</style>
+</head>
+<body>
+
+<div class="toast" id="toast"></div>
+
+<!-- ══ SETUP SCREEN ══ -->
+<div class="screen active" id="setupScreen">
+  <div class="setup-wrap">
+    <div class="setup-logo">AZELA Pro Go</div>
+    <div class="setup-sub">İlk dəfə qurulum</div>
+    <div class="setup-card">
+      <div class="setup-label">Kod 1 — Server</div>
+      <input class="setup-inp" id="setupUrl" type="url" placeholder="https://xxxx.supabase.co" autocomplete="off">
+      <div class="setup-label">Kod 2 — Açar</div>
+      <input class="setup-inp" id="setupKey" type="text" placeholder="eyJhbGci..." autocomplete="off">
+      <button class="setup-btn" onclick="setupConnect()">Bağlan</button>
+      <div class="setup-note">Bu kodları admin panelin Müştəri Bağlantısı bölməsindən götürün.</div>
+    </div>
+  </div>
+</div>
+
+<!-- ══ PIN SCREEN ══ -->
+<div class="screen" id="pinScreen">
+  <div class="pin-wrap">
+    <div class="pin-logo">AZELA Pro Go</div>
+    <div class="pin-sub" id="pinSub">PIN daxil edin</div>
+    <div class="pin-dots">
+      <div class="pin-dot" id="pd0"></div>
+      <div class="pin-dot" id="pd1"></div>
+      <div class="pin-dot" id="pd2"></div>
+      <div class="pin-dot" id="pd3"></div>
+    </div>
+    <div class="pin-pad">
+      <button class="pin-key" onclick="pinPress('1')">1</button>
+      <button class="pin-key" onclick="pinPress('2')">2</button>
+      <button class="pin-key" onclick="pinPress('3')">3</button>
+      <button class="pin-key" onclick="pinPress('4')">4</button>
+      <button class="pin-key" onclick="pinPress('5')">5</button>
+      <button class="pin-key" onclick="pinPress('6')">6</button>
+      <button class="pin-key" onclick="pinPress('7')">7</button>
+      <button class="pin-key" onclick="pinPress('8')">8</button>
+      <button class="pin-key" onclick="pinPress('9')">9</button>
+      <button class="pin-key" style="visibility:hidden"></button>
+      <button class="pin-key" onclick="pinPress('0')">0</button>
+      <button class="pin-key del" onclick="pinDel()">⌫</button>
+    </div>
+  </div>
+</div>
+
+<!-- ══ LIST SCREEN ══ -->
+<div class="screen" id="listScreen">
+  <div class="hdr">
+    <div class="hdr-title">Müştərilər</div>
+    <div style="display:flex;gap:10px;align-items:center">
+      <button class="hdr-btn" id="refreshBtn" onclick="manualRefresh()" style="font-size:18px;transition:transform .3s">🔄</button>
+      <button class="hdr-btn" onclick="showSettings()">⚙️</button>
+    </div>
+  </div>
+  <div class="sync-bar">
+    <div style="display:flex;align-items:center;flex:1">
+      <div class="sync-dot" id="syncDot"></div>
+      <span class="sync-text" id="syncText">Yüklənir...</span>
+    </div>
+    <span class="sync-cd" id="syncCd"></span>
+  </div>
+  <div class="sum-cards">
+    <div class="sum-card" onclick="openSumModal('debt')">
+      <div class="sum-lbl">Ümumi Borc</div>
+      <div class="sum-val" style="color:#f87171" id="sumDebt">—</div>
+      <div class="sum-hint">Detallar ›</div>
+    </div>
+    <div class="sum-card" onclick="openSumModal('debtors')">
+      <div class="sum-lbl">Borclular</div>
+      <div class="sum-val" style="color:#fbbf24" id="sumDebtors">—</div>
+      <div class="sum-hint">Siyahı ›</div>
+    </div>
+  </div>
+  <div class="search-wrap">
+    <input class="search-inp" id="searchInp" type="text" placeholder="🔍  Ad və ya nömrə axtar..." oninput="filterCusts(this.value)">
+  </div>
+  <div class="cust-list" id="custList"></div>
+</div>
+
+<!-- ══ CARD SCREEN ══ -->
+<div class="screen" id="cardScreen">
+  <div class="hdr">
+    <button class="hdr-back" onclick="goBack()">←</button>
+    <div class="hdr-title" id="cardHdrName"></div>
+  </div>
+  <div style="flex:1;overflow-y:auto;">
+    <div class="card-hero">
+      <div class="card-name" id="cardName"></div>
+      <div class="card-phone" id="cardPhone"></div>
+      <div class="card-stats" id="cardStats"></div>
+    </div>
+    <div class="action-row" id="actionRow"></div>
+    <div id="accWrap"></div>
+  </div>
+</div>
+
+<!-- ══ SETTINGS SCREEN ══ -->
+<div class="screen" id="settingsScreen">
+  <div class="hdr">
+    <button class="hdr-back" onclick="hideSettings()">←</button>
+    <div class="hdr-title">Ayarlar</div>
+  </div>
+  <div style="flex:1;overflow-y:auto;padding-top:8px;">
+    <div class="set-section">
+      <div class="set-row">
+        <div>
+          <div class="set-lbl">🔒 PIN qoruması</div>
+          <div class="set-sub">Açılışda PIN tələb etsin</div>
+        </div>
+        <button class="toggle" id="pinToggle" onclick="togglePin()"></button>
+      </div>
+      <div class="set-row" id="changePinRow" style="display:none">
+        <div>
+          <div class="set-lbl">PIN-i dəyiş</div>
+          <div class="set-sub" id="pinStatus">—</div>
+        </div>
+        <button class="set-btn" onclick="startSetPin()">Dəyiş</button>
+      </div>
+    </div>
+    <div class="set-section">
+      <div class="set-row">
+        <div>
+          <div class="set-lbl">🔗 Bağlantı</div>
+          <div class="set-sub" id="connStatus">—</div>
+        </div>
+        <button class="set-btn" onclick="resetConn()" style="background:#fff0f0;border-color:#fca5a5;color:#dc2626">Sıfırla</button>
+      </div>
+    </div>
+    <div style="padding:14px 16px;font-size:11px;color:#94a3b8;line-height:1.7;text-align:center;">
+      AZELA Pro Go · Hər 15 saniyə avtomatik yenilənir
+    </div>
+  </div>
+</div>
+
+<!-- ══ PAY MODAL ══ -->
+<div class="modal-bg hidden" id="payModal">
+  <div class="modal">
+    <div class="modal-title">💰 Ödəniş al</div>
+    <div class="modal-sub" id="payModalSub"></div>
+    <input class="modal-inp" type="number" id="payAmt" placeholder="Məbləğ (₼)" inputmode="decimal">
+    <div class="modal-row">
+      <button class="btn-cancel" onclick="closeModal('payModal')">Ləğv et</button>
+      <button class="btn-ok green" onclick="confirmPay()">Qəbul et</button>
+    </div>
+  </div>
+</div>
+
+<!-- ══ BONUS MODAL ══ -->
+<div class="modal-bg hidden" id="bonusModal">
+  <div class="modal">
+    <div class="modal-title">🎁 Bonusla ödəniş</div>
+    <div class="modal-sub" id="bonusModalSub"></div>
+    <div class="bonus-bal">
+      <span style="font-size:12px;color:#92400e;font-weight:600">Mövcud bonus</span>
+      <span style="font-size:16px;font-weight:800;color:#d97706" id="bonusModalBal"></span>
+    </div>
+    <input class="modal-inp" type="number" id="bonusAmt" placeholder="Məbləğ (₼)" inputmode="decimal">
+    <button class="use-all" onclick="bonusUseAll()">Bütün bonusu istifadə et →</button>
+    <div class="modal-row">
+      <button class="btn-cancel" onclick="closeModal('bonusModal')">Ləğv et</button>
+      <button class="btn-ok orange" onclick="confirmBonus()">Tətbiq et</button>
+    </div>
+  </div>
+</div>
+
+<!-- ══ SUMMARY MODAL ══ -->
+<div class="modal-bg hidden" id="sumModal" onclick="if(event.target===this)closeModal('sumModal')">
+  <div class="modal">
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px">
+      <div class="modal-title" id="sumModalTitle"></div>
+      <button onclick="closeModal('sumModal')" style="background:none;border:none;font-size:22px;cursor:pointer;color:#94a3b8">×</button>
+    </div>
+    <div id="sumModalBody"></div>
+  </div>
+</div>
+
+<script>
+'use strict';
+
+// ─── CONFIG ───
+let SB_URL = localStorage.getItem('go_sb_url') || '';
+let SB_KEY = localStorage.getItem('go_sb_key') || '';
+let _pin = localStorage.getItem('go_pin') || '';
+let _pinEnabled = localStorage.getItem('go_pin_en') === '1';
+
+// ─── STATE ───
+let _custs = [];
+let _bonusMap = {};
+let _cur = null;
+let _goPendingPays = {};
+try { _goPendingPays = JSON.parse(localStorage.getItem('go_pending_pays') || '{}'); } catch(_) {}
+function _savePendingPays() { localStorage.setItem('go_pending_pays', JSON.stringify(_goPendingPays)); }
+let _accOpen = {};
+let _syncTimer = null;
+let _cdTimer = null;
+let _cdVal = 15;
+let _lastSync = null;
+let _syncing = false;
+let _pinInput = '';
+let _pinMode = 'check'; // check | set | set2
+let _pinNew = '';
+let _ws = null;
+
+// ─── SUPABASE API ───
+async function sbGet(path) {
+  const r = await fetch(SB_URL + '/rest/v1/' + path, {
+    headers: { apikey: SB_KEY, Authorization: 'Bearer ' + SB_KEY, Accept: 'application/json' }
+  });
+  if (!r.ok) throw new Error(r.status);
+  return r.json();
+}
+
+async function sbPost(table, data) {
+  await fetch(SB_URL + '/rest/v1/' + table, {
+    method: 'POST',
+    headers: {
+      apikey: SB_KEY, Authorization: 'Bearer ' + SB_KEY,
+      'Content-Type': 'application/json', Prefer: 'return=minimal'
+    },
+    body: JSON.stringify(data)
+  });
+}
+
+async function sbAddGoPay(data) {
+  let pending = [];
+  try {
+    const rows = await sbGet('app_settings?key=eq.go_payments_pending&select=value&limit=1');
+    if (rows && rows[0] && rows[0].value) pending = JSON.parse(rows[0].value) || [];
+  } catch(_) {}
+  pending.push({ ...data, id: 'gp_' + Date.now() });
+  const r = await fetch(SB_URL + '/rest/v1/app_settings', {
+    method: 'POST',
+    headers: {
+      apikey: SB_KEY, Authorization: 'Bearer ' + SB_KEY,
+      'Content-Type': 'application/json',
+      Prefer: 'return=minimal,resolution=merge-duplicates'
+    },
+    body: JSON.stringify({ key: 'go_payments_pending', value: JSON.stringify(pending) })
+  });
+  if (!r.ok) {
+    const txt = await r.text().catch(() => '');
+    throw new Error('Supabase xəta ' + r.status + (txt ? ': ' + txt.slice(0,80) : ''));
+  }
+}
+
+// ─── FETCH DATA ───
+async function fetchData() {
+  if (_syncing) return;
+  _syncing = true;
+  setSyncState('syncing');
+  try {
+    const [custsRaw, settingsRows] = await Promise.all([
+      sbGet('customers?select=id,name,phone,balance&order=name.asc'),
+      sbGet('app_settings?key=eq.customer_bonuses&limit=1')
+    ]);
+    _bonusMap = {};
+    if (settingsRows && settingsRows[0]) {
+      try { _bonusMap = JSON.parse(settingsRows[0].value || '{}'); } catch(_) {}
+    }
+    _custs = (custsRaw || []).map(c => ({
+      id: String(c.id),
+      name: c.name || '',
+      phone: c.phone || '',
+      debt: Math.abs(Math.min(0, c.balance || 0)),
+      bonus: (() => { const bv = _bonusMap[String(c.id)]; return (bv && typeof bv === 'object') ? (bv.amount||0) : (Number(bv)||0); })()
+    }));
+    // Pending ödənişləri tətbiq et (borcu endirmə — yalnız işarələ)
+    let _pendingChanged = false;
+    Object.keys(_goPendingPays).forEach(cid => {
+      const c = _custs.find(x => x.id === cid);
+      if (!c) { delete _goPendingPays[cid]; _pendingChanged = true; return; }
+      const p = _goPendingPays[cid];
+      const pendingAmt  = (typeof p === 'object') ? p.amt      : p;
+      const debtBefore  = (typeof p === 'object') ? p.debtBefore : null;
+      // Silinmə şərti: borc 0-dır YA DA borc təsdiq öncəsindən azalmışdır
+      const processed = c.debt === 0 || (debtBefore !== null && c.debt <= debtBefore - pendingAmt + 0.5);
+      if (processed) { delete _goPendingPays[cid]; _pendingChanged = true; return; }
+      c._pendingAmt = pendingAmt;
+    });
+    if (_pendingChanged) _savePendingPays();
+    _lastSync = new Date();
+    renderList(_custs);
+    renderSummary();
+    setSyncState('ok');
+    resetCountdown();
+  } catch(e) {
+    setSyncState('err');
+  } finally {
+    _syncing = false;
+  }
+}
+
+// ─── REALTIME ───
+function connectRealtime() {
+  if (!SB_URL || !SB_KEY) return;
+  try {
+    const wsUrl = SB_URL.replace('https://', 'wss://').replace('http://', 'ws://') + '/realtime/v1/websocket?apikey=' + SB_KEY + '&vsn=1.0.0';
+    _ws = new WebSocket(wsUrl);
+    _ws.onopen = () => {
+      _ws.send(JSON.stringify({ topic: 'realtime:public:customers', event: 'phx_join', payload: {}, ref: '1' }));
+      _ws.send(JSON.stringify({ topic: 'realtime:public:payments',  event: 'phx_join', payload: {}, ref: '2' }));
+      _ws.send(JSON.stringify({ topic: 'realtime:public:sales',     event: 'phx_join', payload: {}, ref: '3' }));
+    };
+    _ws.onmessage = e => {
+      try {
+        const msg = JSON.parse(e.data);
+        if (msg.event === 'INSERT' || msg.event === 'UPDATE' || msg.event === 'DELETE') {
+          fetchData();
+          setSyncState('notify');
+        }
+      } catch(_) {}
+    };
+    _ws.onclose = () => { setTimeout(connectRealtime, 5000); };
+    _ws.onerror = () => {};
+  } catch(_) {}
+}
+
+// ─── SYNC MANAGEMENT ───
+function startSync() {
+  fetchData();
+  if (_syncTimer) clearInterval(_syncTimer);
+  _syncTimer = setInterval(fetchData, 6000);
+  resetCountdown();
+  connectRealtime();
+}
+
+function resetCountdown() {
+  _cdVal = 15;
+  if (_cdTimer) clearInterval(_cdTimer);
+  _cdTimer = setInterval(() => {
+    _cdVal--;
+    const el = document.getElementById('syncCd');
+    if (el) el.textContent = _cdVal + 's';
+    if (_cdVal <= 0) _cdVal = 15;
+  }, 1000);
+}
+
+function manualRefresh() {
+  const btn = document.getElementById('refreshBtn');
+  if (btn) { btn.style.transform = 'rotate(360deg)'; setTimeout(() => btn.style.transform = '', 400); }
+  clearInterval(_syncTimer);
+  _syncTimer = setInterval(fetchData, 6000);
+  fetchData();
+  resetCountdown();
+}
+
+function setSyncState(state) {
+  const dot  = document.getElementById('syncDot');
+  const text = document.getElementById('syncText');
+  if (!dot || !text) return;
+  if (state === 'syncing') {
+    dot.style.background = '#f59e0b';
+    text.textContent = 'Yenilənir...';
+  } else if (state === 'ok') {
+    dot.style.background = '#4ade80';
+    if (_lastSync) {
+      const t = _lastSync;
+      text.textContent = 'Son: ' + pad(t.getHours()) + ':' + pad(t.getMinutes()) + ':' + pad(t.getSeconds());
+    }
+  } else if (state === 'notify') {
+    dot.style.background = '#818cf8';
+    text.textContent = '🔔 Admin yenilədi!';
+    setTimeout(() => setSyncState('ok'), 2500);
+  } else if (state === 'err') {
+    dot.style.background = '#ef4444';
+    text.textContent = '❌ Bağlantı xətası';
+  }
+}
+
+function pad(n) { return String(n).padStart(2, '0'); }
+
+// ─── LIST ───
+function renderSummary() {
+  const total   = _custs.reduce((s, c) => s + c.debt, 0);
+  const debtors = _custs.filter(c => c.debt > 0).length;
+  const d = document.getElementById('sumDebt');
+  const r = document.getElementById('sumDebtors');
+  if (d) d.textContent = total.toFixed(2) + ' ₼';
+  if (r) r.textContent = debtors + ' nəfər';
+}
+
+function renderList(list) {
+  const el = document.getElementById('custList');
+  if (!el) return;
+  if (!list.length) { el.innerHTML = '<div class="empty-msg">Müştəri tapılmadı</div>'; return; }
+  el.innerHTML = list.map(c => `
+    <div class="cust-row" onclick="openCard('${c.id}')">
+      <div class="cust-av">${(c.name[0]||'?').toUpperCase()}</div>
+      <div class="cust-info">
+        <div class="cust-name">${esc(c.name)}</div>
+        <div class="cust-phone">${esc(c.phone||'')}</div>
+      </div>
+      <div class="cust-debt-wrap">
+        ${c._pendingAmt
+          ? `<div class="cust-debt-amt" style="color:#f59e0b;font-size:11px;font-weight:800">⏳ Gözləmədədir</div>
+             <div class="cust-debt-lbl">${c.debt.toFixed(2)} ₼ borc var</div>`
+          : `<div class="cust-debt-amt ${c.debt===0?'zero':''}">${c.debt.toFixed(2)} ₼</div>
+             <div class="cust-debt-lbl">${c.debt===0?'Borcsuz':'Borc'}</div>`}
+      </div>
+    </div>
+  `).join('');
+}
+
+function filterCusts(q) {
+  q = q.toLowerCase().trim();
+  if (!q) { renderList(_custs); return; }
+  renderList(_custs.filter(c => c.name.toLowerCase().includes(q) || (c.phone||'').includes(q)));
+}
+
+// ─── CARD ───
+async function openCard(id) {
+  _cur = _custs.find(c => c.id === id);
+  if (!_cur) return;
+  _accOpen = {};
+
+  document.getElementById('cardHdrName').textContent = _cur.name;
+  document.getElementById('cardName').textContent    = _cur.name;
+  document.getElementById('cardPhone').textContent   = _cur.phone || '';
+
+  const statsEl = document.getElementById('cardStats');
+  let statsHtml = `
+    <div class="card-stat">
+      <div class="card-stat-lbl">Cari Borc</div>
+      <div class="card-stat-val" style="color:#f87171">${_cur.debt.toFixed(2)} ₼</div>
+    </div>`;
+  if (_cur._pendingAmt) {
+    statsHtml += `
+      <div class="card-stat">
+        <div class="card-stat-lbl">Ödəniş</div>
+        <div class="card-stat-val" style="color:#f59e0b;font-size:13px">⏳ ${_cur._pendingAmt.toFixed(2)} ₼ gözləmədədir</div>
+      </div>`;
+  }
+  if (_cur.bonus > 0) {
+    statsHtml += `
+      <div class="card-stat">
+        <div class="card-stat-lbl">🎁 Bonus</div>
+        <div class="card-stat-val" style="color:#fbbf24">${_cur.bonus.toFixed(2)} ₼</div>
+      </div>`;
+  }
+  statsEl.innerHTML = statsHtml;
+
+  const actEl = document.getElementById('actionRow');
+  let actHtml = _cur._pendingAmt
+    ? `<button class="act-btn pay" disabled style="opacity:.45;cursor:not-allowed"><span class="ico">⏳</span>Gözləmədədir</button>`
+    : `<button class="act-btn pay" onclick="openPayModal()"><span class="ico">💰</span>Ödəniş al</button>`;
+  if (_cur.bonus > 0 && !_cur._pendingAmt) {
+    actHtml += `<button class="act-btn bonus" onclick="openBonusModal()"><span class="ico">🎁</span>Bonusla ödə</button>`;
+  }
+  actEl.innerHTML = actHtml;
+
+  const accEl = document.getElementById('accWrap');
+  accEl.innerHTML = `
+    <div class="acc-hdr" onclick="toggleAcc('sales')">
+      <div class="acc-hdr-left">🧾 Alışlar</div>
+      <span class="acc-arrow" id="arrSales">▼</span>
+    </div>
+    <div class="acc-body" id="accSales">
+      <div class="date-filter">
+        <input class="date-inp" type="date" id="sfrom" onchange="loadSales()">
+        <span style="color:#94a3b8;font-size:12px">—</span>
+        <input class="date-inp" type="date" id="sto" onchange="loadSales()">
+        <button class="date-clear" onclick="clearDates('s')">✕</button>
+      </div>
+      <div id="salesBody" class="list-wrap"></div>
+    </div>
+    <div class="acc-hdr" onclick="toggleAcc('pays')" style="margin-top:4px">
+      <div class="acc-hdr-left">💰 Ödənişlər</div>
+      <span class="acc-arrow" id="arrPays">▼</span>
+    </div>
+    <div class="acc-body" id="accPays">
+      <div class="date-filter">
+        <input class="date-inp" type="date" id="pfrom" onchange="loadPays()">
+        <span style="color:#94a3b8;font-size:12px">—</span>
+        <input class="date-inp" type="date" id="pto" onchange="loadPays()">
+        <button class="date-clear" onclick="clearDates('p')">✕</button>
+      </div>
+      <div id="paysBody" class="list-wrap"></div>
+    </div>
+    <div style="height:24px"></div>
+  `;
+
+  showScreen('cardScreen');
+}
+
+function toggleAcc(key) {
+  _accOpen[key] = !_accOpen[key];
+  const body  = document.getElementById('acc' + (key==='sales'?'Sales':'Pays'));
+  const arrow = document.getElementById('arr' + (key==='sales'?'Sales':'Pays'));
+  if (_accOpen[key]) {
+    body.classList.add('open');
+    arrow.classList.add('open');
+    if (key === 'sales') loadSales();
+    else loadPays();
+  } else {
+    body.classList.remove('open');
+    arrow.classList.remove('open');
+  }
+}
+
+async function loadSales() {
+  const el = document.getElementById('salesBody');
+  if (!el) return;
+  el.innerHTML = '<div class="loader"><div class="spinner"></div>Yüklənir...</div>';
+  const from = (document.getElementById('sfrom')||{}).value || '';
+  const to   = (document.getElementById('sto')||{}).value || '';
+  try {
+    let q = 'sales?customer_id=eq.' + encodeURIComponent(_cur.id) + '&order=date.desc&limit=100';
+    if (from) q += '&date=gte.' + from;
+    if (to)   q += '&date=lte.' + to + 'T23:59:59';
+    const rows = await sbGet(q);
+    if (!rows || !rows.length) { el.innerHTML = '<div class="empty-msg">Alış yoxdur</div>'; return; }
+    el.innerHTML = rows.map(s => {
+      let items = [];
+      try { items = JSON.parse(s.items_json || '[]'); } catch(_) {}
+      return `<div class="sale-row">
+        <div class="sale-hdr">
+          <div class="sale-date">📅 ${(s.date||'').slice(0,10)}</div>
+          <div class="sale-total">${(s.total||0).toFixed(2)} ₼</div>
+        </div>
+        ${items.map(it => `
+          <div class="sale-item">
+            <div><span class="sale-item-name">${esc(it.name||'')}</span><span class="sale-item-qty">×${it.qty||1}</span></div>
+            <span style="font-size:12px;color:#94a3b8">${((it.sellPrice||it.price||0)*(it.qty||1)).toFixed(2)} ₼</span>
+          </div>`).join('')}
+      </div>`;
+    }).join('');
+  } catch(_) { el.innerHTML = '<div class="empty-msg">Yüklənmə xətası</div>'; }
+}
+
+async function loadPays() {
+  const el = document.getElementById('paysBody');
+  if (!el) return;
+  el.innerHTML = '<div class="loader"><div class="spinner"></div>Yüklənir...</div>';
+  const from = (document.getElementById('pfrom')||{}).value || '';
+  const to   = (document.getElementById('pto')||{}).value || '';
+  try {
+    let q = 'payments?customer_id=eq.' + encodeURIComponent(_cur.id) + '&order=date.desc,id.desc&limit=100';
+    if (from) q += '&date=gte.' + from;
+    if (to)   q += '&date=lte.' + to;
+    const rows = await sbGet(q);
+    if (!rows || !rows.length) { el.innerHTML = '<div class="empty-msg">Ödəniş yoxdur</div>'; return; }
+    el.innerHTML = rows.map(p => `
+      <div class="pay-row">
+        <div class="pay-ico">💰</div>
+        <div class="pay-info">
+          <div class="pay-note">${esc(p.note||'Ödəniş')}</div>
+          <div class="pay-date">${(p.date||'').slice(0,10)}</div>
+        </div>
+        <div class="pay-amt">+${(p.amount||0).toFixed(2)} ₼</div>
+      </div>`).join('');
+  } catch(_) { el.innerHTML = '<div class="empty-msg">Yüklənmə xətası</div>'; }
+}
+
+function clearDates(prefix) {
+  const f = document.getElementById(prefix+'from');
+  const t = document.getElementById(prefix+'to');
+  if (f) f.value = '';
+  if (t) t.value = '';
+  if (prefix === 's') loadSales();
+  else loadPays();
+}
+
+function goBack() {
+  renderList(_custs);
+  renderSummary();
+  showScreen('listScreen');
+  _cur = null;
+}
+
+// ─── PAYMENT ───
+function openPayModal() {
+  if (_cur._pendingAmt) { toast('⏳ Ödəniş artıq gözləmədədir'); return; }
+  document.getElementById('payModalSub').textContent = _cur.name + ' · Borc: ' + _cur.debt.toFixed(2) + ' ₼';
+  document.getElementById('payAmt').value = '';
+  document.getElementById('payModal').classList.remove('hidden');
+  setTimeout(() => document.getElementById('payAmt').focus(), 150);
+}
+
+async function confirmPay() {
+  if (_cur._pendingAmt) { toast('⏳ Ödəniş artıq gözləmədədir'); return; }
+  const amt = parseFloat(document.getElementById('payAmt').value);
+  if (!amt || amt <= 0) { toast('❌ Məbləğ daxil edin'); return; }
+  if (amt > (_cur.debt || 0)) { toast('❌ Maksimum ' + (_cur.debt || 0).toFixed(2) + ' ₼ qeyd edə bilərsiniz'); return; }
+  const btn = document.querySelector('#payModal .btn-ok');
+  btn.textContent = '...'; btn.disabled = true;
+  try {
+    await sbAddGoPay({
+      customer_id: _cur.id,
+      customer_name: _cur.name,
+      amount: amt,
+      note: 'Nağd ödəniş',
+      date: new Date().toISOString().slice(0, 10),
+      status: 'pending'
+    });
+    _goPendingPays[_cur.id] = { amt, debtBefore: _cur.debt };
+    _savePendingPays();
+    _cur._pendingAmt = amt;
+    const c = _custs.find(x => x.id === _cur.id);
+    if (c) { c._pendingAmt = amt; }
+    updateCardDebt();
+    renderSummary();
+    closeModal('payModal');
+    toast('✓ ' + amt.toFixed(2) + ' ₼ ödəniş qeydə alındı');
+  } catch(_) {
+    toast('❌ Qeyd edilmədi — internet yoxdur?');
+  } finally {
+    btn.textContent = 'Qəbul et'; btn.disabled = false;
+  }
+}
+
+// ─── BONUS ───
+function openBonusModal() {
+  document.getElementById('bonusModalSub').textContent = _cur.name;
+  document.getElementById('bonusModalBal').textContent = _cur.bonus.toFixed(2) + ' ₼';
+  document.getElementById('bonusAmt').value = '';
+  document.getElementById('bonusModal').classList.remove('hidden');
+  setTimeout(() => document.getElementById('bonusAmt').focus(), 150);
+}
+
+function bonusUseAll() {
+  const max = Math.min(_cur.bonus, _cur.debt);
+  document.getElementById('bonusAmt').value = max.toFixed(2);
+}
+
+async function confirmBonus() {
+  const amt = parseFloat(document.getElementById('bonusAmt').value);
+  if (!amt || amt <= 0) { toast('❌ Məbləğ daxil edin'); return; }
+  if (amt > _cur.bonus) { toast('❌ Bonusdan çox məbləğ'); return; }
+  if (amt > (_cur.debt || 0)) { toast('❌ Maksimum ' + (_cur.debt || 0).toFixed(2) + ' ₼ qeyd edə bilərsiniz'); return; }
+  const btn = document.querySelector('#bonusModal .btn-ok');
+  btn.textContent = '...'; btn.disabled = true;
+  try {
+    await sbAddGoPay({
+      customer_id: _cur.id,
+      customer_name: _cur.name,
+      amount: amt,
+      note: 'Bonus ilə ödəniş',
+      date: new Date().toISOString().slice(0, 10),
+      status: 'pending',
+      type: 'bonus'
+    });
+    _cur.bonus = Math.max(0, _cur.bonus - amt);
+    _cur.debt  = Math.max(0, _cur.debt - amt);
+    const c = _custs.find(x => x.id === _cur.id);
+    if (c) { c.debt = _cur.debt; c.bonus = _cur.bonus; }
+    updateCardDebt();
+    renderSummary();
+    closeModal('bonusModal');
+    toast('✓ ' + amt.toFixed(2) + ' ₼ bonus tətbiq edildi');
+  } catch(_) {
+    toast('❌ Qeyd edilmədi — internet yoxdur?');
+  } finally {
+    btn.textContent = 'Tətbiq et'; btn.disabled = false;
+  }
+}
+
+function updateCardDebt() {
+  const statsEl = document.getElementById('cardStats');
+  if (!statsEl || !_cur) return;
+  let html = `
+    <div class="card-stat">
+      <div class="card-stat-lbl">Cari Borc</div>
+      <div class="card-stat-val" style="color:#f87171">${_cur.debt.toFixed(2)} ₼</div>
+    </div>`;
+  if (_cur._pendingAmt) {
+    html += `<div class="card-stat"><div class="card-stat-lbl">Ödəniş</div><div class="card-stat-val" style="color:#f59e0b;font-size:13px">⏳ ${_cur._pendingAmt.toFixed(2)} ₼ gözləmədədir</div></div>`;
+  }
+  if (_cur.bonus > 0) {
+    html += `
+      <div class="card-stat">
+        <div class="card-stat-lbl">🎁 Bonus</div>
+        <div class="card-stat-val" style="color:#fbbf24">${_cur.bonus.toFixed(2)} ₼</div>
+      </div>`;
+  }
+  statsEl.innerHTML = html;
+  const actEl = document.getElementById('actionRow');
+  if (actEl) {
+    let a = _cur._pendingAmt
+      ? `<button class="act-btn pay" disabled style="opacity:.45;cursor:not-allowed"><span class="ico">⏳</span>Gözləmədədir</button>`
+      : `<button class="act-btn pay" onclick="openPayModal()"><span class="ico">💰</span>Ödəniş al</button>`;
+    if (_cur.bonus > 0 && !_cur._pendingAmt) a += `<button class="act-btn bonus" onclick="openBonusModal()"><span class="ico">🎁</span>Bonusla ödə</button>`;
+    actEl.innerHTML = a;
+  }
+}
+
+// ─── SUMMARY MODAL ───
+function openSumModal(type) {
+  const title = document.getElementById('sumModalTitle');
+  const body  = document.getElementById('sumModalBody');
+  if (type === 'debt') {
+    title.textContent = '💳 Borc detalları';
+    const sorted = [..._custs].filter(c => c.debt > 0).sort((a,b) => b.debt - a.debt);
+    const total  = _custs.reduce((s,c) => s + c.debt, 0);
+    body.innerHTML = `
+      <div style="background:#fef2f2;border-radius:10px;padding:10px 14px;margin-bottom:12px;display:flex;justify-content:space-between;align-items:center">
+        <span style="font-size:12px;color:#991b1b;font-weight:700">Ümumi borc</span>
+        <span style="font-size:18px;font-weight:900;color:#dc2626">${total.toFixed(2)} ₼</span>
+      </div>
+      ${sorted.map((c,i) => {
+        const pct = total > 0 ? c.debt/total*100 : 0;
+        return `<div class="sum-modal-row" onclick="closeModal('sumModal');openCard('${c.id}')">
+          <div style="flex:1;min-width:0;padding-right:10px">
+            <div style="font-size:13px;font-weight:700;color:#1e293b">${i+1}. ${esc(c.name)}</div>
+            <div class="sum-bar-bg"><div class="sum-bar-fill" style="width:${pct.toFixed(1)}%"></div></div>
+            <div style="font-size:10px;color:#94a3b8;margin-top:2px">${pct.toFixed(1)}%</div>
+          </div>
+          <div style="text-align:right;flex-shrink:0">
+            <div style="font-size:14px;font-weight:800;color:#dc2626">${c.debt.toFixed(2)} ₼</div>
+            <div style="font-size:10px;color:#94a3b8">Karta keç ›</div>
+          </div>
+        </div>`;
+      }).join('') || '<div class="empty-msg">Borcu olan müştəri yoxdur</div>'}`;
+  } else {
+    title.textContent = '👥 Borclu müştərilər';
+    const debtors = _custs.filter(c => c.debt > 0).sort((a,b) => b.debt - a.debt);
+    const noDebt  = _custs.filter(c => c.debt === 0);
+    body.innerHTML = `
+      <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;margin-bottom:12px">
+        <div style="background:#fef2f2;border-radius:10px;padding:10px;text-align:center">
+          <div style="font-size:20px;font-weight:900;color:#dc2626">${debtors.length}</div>
+          <div style="font-size:10px;color:#991b1b;font-weight:600">Borclular</div>
+        </div>
+        <div style="background:#f0fdf4;border-radius:10px;padding:10px;text-align:center">
+          <div style="font-size:20px;font-weight:900;color:#16a34a">${noDebt.length}</div>
+          <div style="font-size:10px;color:#15803d;font-weight:600">Borcsuzlar</div>
+        </div>
+        <div style="background:#f8fafc;border-radius:10px;padding:10px;text-align:center">
+          <div style="font-size:20px;font-weight:900;color:#334155">${_custs.length}</div>
+          <div style="font-size:10px;color:#64748b;font-weight:600">Cəmi</div>
+        </div>
+      </div>
+      ${debtors.map(c => `
+        <div class="sum-modal-row" onclick="closeModal('sumModal');openCard('${c.id}')">
+          <div style="display:flex;align-items:center;gap:9px;flex:1">
+            <div style="width:34px;height:34px;border-radius:50%;background:linear-gradient(135deg,#ef4444,#f87171);display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:800;color:#fff;flex-shrink:0">${(c.name[0]||'?').toUpperCase()}</div>
+            <div><div style="font-size:13px;font-weight:700">${esc(c.name)}</div><div style="font-size:11px;color:#94a3b8">${esc(c.phone||'')}</div></div>
+          </div>
+          <div style="text-align:right;flex-shrink:0">
+            <div style="font-size:14px;font-weight:800;color:#dc2626">${c.debt.toFixed(2)} ₼</div>
+            <div style="font-size:10px;color:#94a3b8">›</div>
+          </div>
+        </div>`).join('') || '<div class="empty-msg">Borclu müştəri yoxdur</div>'}`;
+  }
+  document.getElementById('sumModal').classList.remove('hidden');
+}
+
+// ─── SETUP ───
+async function setupConnect() {
+  const url = document.getElementById('setupUrl').value.trim().replace(/\/$/, '');
+  const key = document.getElementById('setupKey').value.trim();
+  if (!url || !key) { toast('❌ Hər iki sahəni doldurun'); return; }
+  if (!url.includes('supabase.co')) { toast('❌ URL düzgün deyil'); return; }
+  const btn = document.querySelector('.setup-btn');
+  btn.textContent = 'Yoxlanır...'; btn.disabled = true;
+  try {
+    const r = await fetch(url + '/rest/v1/customers?limit=1', {
+      headers: { apikey: key, Authorization: 'Bearer ' + key }
+    });
+    if (!r.ok) throw new Error();
+    SB_URL = url; SB_KEY = key;
+    localStorage.setItem('go_sb_url', url);
+    localStorage.setItem('go_sb_key', key);
+    boot();
+  } catch(_) {
+    toast('❌ Bağlantı uğursuz — kodları yoxlayın');
+    btn.textContent = 'Bağlan'; btn.disabled = false;
+  }
+}
+
+function resetConn() {
+  if (!confirm('Bağlantı məlumatları silinsin?')) return;
+  localStorage.removeItem('go_sb_url');
+  localStorage.removeItem('go_sb_key');
+  SB_URL = ''; SB_KEY = '';
+  if (_syncTimer) clearInterval(_syncTimer);
+  if (_cdTimer) clearInterval(_cdTimer);
+  if (_ws) _ws.close();
+  showScreen('setupScreen');
+}
+
+// ─── PIN ───
+function pinPress(d) {
+  if (_pinInput.length >= 4) return;
+  _pinInput += d;
+  updateDots();
+  if (_pinInput.length === 4) setTimeout(pinSubmit, 120);
+}
+
+function pinDel() {
+  _pinInput = _pinInput.slice(0, -1);
+  updateDots();
+}
+
+function updateDots(cls) {
+  for (let i = 0; i < 4; i++) {
+    const el = document.getElementById('pd' + i);
+    if (!el) return;
+    el.className = 'pin-dot' + (i < _pinInput.length ? ' ' + (cls || 'filled') : '');
+  }
+}
+
+function pinSubmit() {
+  if (_pinMode === 'check') {
+    if (_pinInput === _pin) {
+      showScreen('listScreen');
+      startSync();
+    } else {
+      updateDots('err');
+      setTimeout(() => { _pinInput = ''; updateDots(); }, 600);
+    }
+  } else if (_pinMode === 'set') {
+    _pinNew = _pinInput; _pinInput = ''; _pinMode = 'set2';
+    document.getElementById('pinSub').textContent = 'Yenidən daxil edin';
+    updateDots();
+  } else if (_pinMode === 'set2') {
+    if (_pinInput === _pinNew) {
+      _pin = _pinNew;
+      localStorage.setItem('go_pin', _pin);
+      document.getElementById('pinStatus').textContent = 'PIN təyin edilib ✓';
+      hideSettings();
+      toast('✓ PIN saxlandı');
+      _pinInput = ''; _pinMode = 'check';
+    } else {
+      updateDots('err');
+      setTimeout(() => {
+        _pinInput = ''; _pinMode = 'set';
+        document.getElementById('pinSub').textContent = 'Uyğun gəlmədi. Yenidən:';
+        updateDots();
+      }, 600);
+    }
+  }
+}
+
+function togglePin() {
+  _pinEnabled = !_pinEnabled;
+  localStorage.setItem('go_pin_en', _pinEnabled ? '1' : '0');
+  document.getElementById('pinToggle').className = 'toggle' + (_pinEnabled ? ' on' : '');
+  document.getElementById('changePinRow').style.display = _pinEnabled ? 'flex' : 'none';
+  if (_pinEnabled && !_pin) startSetPin();
+}
+
+function startSetPin() {
+  _pinInput = ''; _pinNew = ''; _pinMode = 'set';
+  document.getElementById('pinSub').textContent = 'Yeni PIN daxil edin';
+  showScreen('pinScreen');
+}
+
+// ─── SETTINGS ───
+function showSettings() {
+  document.getElementById('pinToggle').className = 'toggle' + (_pinEnabled ? ' on' : '');
+  document.getElementById('changePinRow').style.display = _pinEnabled ? 'flex' : 'none';
+  document.getElementById('pinStatus').textContent = _pin ? 'PIN təyin edilib ✓' : 'PIN təyin edilməyib';
+  document.getElementById('connStatus').textContent = SB_URL ? SB_URL.replace('https://', '').split('.')[0] + '.supabase.co' : '—';
+  showScreen('settingsScreen');
+}
+
+function hideSettings() {
+  showScreen('listScreen');
+}
+
+// ─── UTILS ───
+function showScreen(id) {
+  document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+  const el = document.getElementById(id);
+  if (el) el.classList.add('active');
+}
+
+function closeModal(id) {
+  document.getElementById(id).classList.add('hidden');
+}
+
+function esc(s) {
+  return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+}
+
+function toast(msg) {
+  const el = document.getElementById('toast');
+  el.textContent = msg;
+  el.classList.add('show');
+  setTimeout(() => el.classList.remove('show'), 2500);
+}
+
+// ─── BOOT ───
+function boot() {
+  if (!SB_URL || !SB_KEY) { showScreen('setupScreen'); return; }
+  if (_pinEnabled && _pin) {
+    _pinInput = ''; _pinMode = 'check';
+    document.getElementById('pinSub').textContent = 'PIN daxil edin';
+    updateDots();
+    showScreen('pinScreen');
+  } else {
+    showScreen('listScreen');
+    startSync();
+  }
+}
+
+boot();
+</script>
+</body>
+</html>

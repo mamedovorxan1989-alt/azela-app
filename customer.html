@@ -45,7 +45,7 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;backgrou
 .stat-card{background:#fff;border-radius:16px;padding:13px 14px;box-shadow:0 1px 4px rgba(0,0,0,.07);}
 .stat-lbl{font-size:10.5px;font-weight:700;color:#94a3b8;text-transform:uppercase;letter-spacing:.4px;margin-bottom:5px;}
 .stat-val{font-size:20px;font-weight:800;color:#1e293b;}
-.stat-val.accent{color:#6366f1;} .stat-val.green{color:#16a34a;} .stat-val.red{color:#dc2626;}
+.stat-val.accent{color:#7c3aed;} .stat-val.green{color:#16a34a;} .stat-val.red{color:#dc2626;}
 
 /* ── FILTER ── */
 .filter-bar{display:flex;gap:6px;overflow-x:auto;padding:10px 16px 12px;scrollbar-width:none;}
@@ -168,7 +168,7 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;backgrou
   <div style="margin-top:20px;text-align:center">
     <button onclick="resetSetup()" style="background:none;border:none;color:rgba(255,255,255,0.25);font-size:11px;cursor:pointer;padding:4px 8px;font-family:inherit">⚙ Ayarları sıfırla</button>
   </div>
-  <div style="margin-top:8px;text-align:center;color:rgba(255,255,255,0.15);font-size:10px">v2.3.1</div>
+  <div style="margin-top:8px;text-align:center;color:rgba(255,255,255,0.15);font-size:10px">v2.3.11</div>
 </div>
 
 <!-- APP -->
@@ -196,8 +196,7 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;backgrou
   <div class="tabs">
     <button class="tab active" id="tabBtn-prods"  onclick="switchTab('prods',this)">Məhsullar</button>
     <button class="tab"        id="tabBtn-ops"    onclick="switchTab('ops',this)">Əməliyyat</button>
-    <button class="tab"        id="tabBtn-purch"  onclick="switchTab('purch',this)">Alışlar</button>
-    <button class="tab"        id="tabBtn-pay"    onclick="switchTab('pay',this)">Ödənişlər</button>
+    <button class="tab"        id="tabBtn-melumat" onclick="switchTab('melumat',this)">Məlumatlar</button>
     <button class="tab"        id="tabBtn-bonus"  onclick="switchTab('bonus',this)">⭐ Bonus</button>
   </div>
 
@@ -225,8 +224,8 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;backgrou
 
       <!-- Yeni filter: Bu gün / 1 ay / 3 ay / 6 ay / 1 il -->
       <div class="filter-bar">
-        <button class="filter-btn active" onclick="setFilter('day',this)">Bu gün</button>
-        <button class="filter-btn" onclick="setFilter('m1',this)">Bir ay</button>
+        <button class="filter-btn" onclick="setFilter('day',this)">Bu gün</button>
+        <button class="filter-btn active" onclick="setFilter('m1',this)">Bir ay</button>
         <button class="filter-btn" onclick="setFilter('m3',this)">Üç ay</button>
         <button class="filter-btn" onclick="setFilter('m6',this)">Altı ay</button>
         <button class="filter-btn" onclick="setFilter('y1',this)">Bir il</button>
@@ -250,16 +249,9 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;backgrou
       </div>
     </div>
 
-    <!-- ── ALIŞLAR ── -->
-    <div class="tab-panel" id="tab-purch">
-      <div class="section-title">Alışlar</div>
-      <div id="purchList"><div class="empty">Alış məlumatı yoxdur</div></div>
-    </div>
-
-    <!-- ── ÖDƏNİŞLƏR ── -->
-    <div class="tab-panel" id="tab-pay">
-      <div class="section-title">Ödəniş tarixçəsi</div>
-      <div id="payList"><div class="empty">Ödəniş məlumatı yoxdur</div></div>
+    <!-- ── MƏLUMATLAR (Alışlar + Ödənişlər birləşik) ── -->
+    <div class="tab-panel" id="tab-melumat">
+      <div id="melumatList"><div class="empty">Məlumat yoxdur</div></div>
     </div>
 
     <!-- ── BONUS ── -->
@@ -270,6 +262,8 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;backgrou
         <div class="bonus-val" id="bonusVal">0.00 ₼</div>
         <div class="bonus-desc" id="bonusDesc">Bu bonus mağaza tərəfindən sizin alışlarınıza görə hesablanmışdır.<br>Növbəti ödənişdə istifadə edilə bilər.</div>
       </div>
+      <div class="section-title">Bonus tarixçəsi</div>
+      <div id="bonusHistList"><div class="empty">Tarixçə yoxdur</div></div>
     </div>
 
   </div>
@@ -316,6 +310,21 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;backgrou
   </div>
 </div>
 
+<!-- SATIŞ DETAYİ BOTTOM SHEET -->
+<div id="saleDetailBackdrop" onclick="closeSaleDetail()" style="display:none;position:fixed;inset:0;background:rgba(15,0,37,0.6);z-index:200;backdrop-filter:blur(2px)"></div>
+<div id="saleDetailSheet" style="display:none;position:fixed;bottom:0;left:0;right:0;background:#fff;border-radius:20px 20px 0 0;z-index:201;max-height:82vh;overflow-y:auto;padding-bottom:env(safe-area-inset-bottom,12px)">
+  <div style="text-align:center;padding:14px 0 0"><div style="width:40px;height:4px;background:#e2e8f0;border-radius:2px;margin:0 auto"></div></div>
+  <div style="padding:16px 20px 8px;display:flex;justify-content:space-between;align-items:flex-start">
+    <div>
+      <div id="sdTitle" style="font-size:16px;font-weight:800;color:#1e293b;margin-bottom:4px"></div>
+      <div id="sdMeta" style="font-size:12px;color:#94a3b8;line-height:1.6"></div>
+    </div>
+    <button onclick="closeSaleDetail()" style="background:#f1f5f9;border:none;border-radius:10px;width:32px;height:32px;cursor:pointer;font-size:15px;flex-shrink:0;margin-left:12px">✕</button>
+  </div>
+  <div id="sdItems" style="padding:0 20px"></div>
+  <div id="sdFooter" style="padding:14px 20px 4px;border-top:1px solid #f1f5f9;margin-top:4px"></div>
+</div>
+
 </div><!-- /phone -->
 <script>
 /* ── Config ──────────────────────────────── */
@@ -333,7 +342,7 @@ const SB_URL=_rawSbUrl, SB_KEY=_rawSbKey;
 (function _init(){
   if (!SB_URL||!SB_KEY){document.getElementById('screenLogin').style.display='none';document.getElementById('screenSetup').style.display='flex';return;}
   const saved=localStorage.getItem('azela_user_email');
-  if (saved){document.getElementById('screenLogin').style.display='none';document.getElementById('screenApp').style.display='flex';setTimeout(()=>_autoLogin(saved),100);}
+  if (saved){document.getElementById('screenLogin').style.display='none';document.getElementById('screenApp').style.display='flex';_autoLogin(saved);}
 })();
 
 function resetSetup(){localStorage.removeItem('azela_sb_cfg');location.reload();}
@@ -397,14 +406,16 @@ function doSetup(){
 
 /* ── State ───────────────────────────────── */
 let _PRODUCTS=[], _currentSales=[], _currentPmts=[], _currentRets=[];
+let _bonusPmtIds=new Set();
+let _renderedSales=[];
 let _apkHidden=new Set();
 let _currentBalance=0, _currentEmail='', _currentCustId='';
 let _heartbeatTimer=null, _refreshTimer=null, _visHandler=null;
-let _prodSearchVal='', _apkFilter='day', _opsLoaded=false;
+let _prodSearchVal='', _apkFilter='m1', _opsLoaded=false;
 
 const PAY_LABEL={nagd:'Nağd',nisye:'Nisyə',qismen:'Qismən',evaz:'Əvəzetmə',qaytarma:'↩ Qaytarma'};
 const PAY_CLS  ={nagd:'nagd',nisye:'nisye',qismen:'qismen',evaz:'evaz',qaytarma:'qaytarma'};
-const CAT_COLORS={LCD:'#6366f1',BAT:'#f59e0b',COVER:'#10b981',FLEX:'#ef4444',UL:'#8b5cf6',DIGƏR:'#94a3b8'};
+const CAT_COLORS={LCD:'#7c3aed',BAT:'#f59e0b',COVER:'#10b981',FLEX:'#ef4444',UL:'#8b5cf6',DIGƏR:'#94a3b8'};
 
 /* ── Tab ─────────────────────────────────── */
 function switchTab(name,el){
@@ -413,13 +424,21 @@ function switchTab(name,el){
   el.classList.add('active');
   document.getElementById('tab-'+name).classList.add('active');
   if(_opsTimer){clearInterval(_opsTimer);_opsTimer=null;}
-  if(name==='ops'){
+  if(name==='ops'){setTimeout(_redrawCharts,50);}
+  _triggerOpsLoad(name);
+}
+function _triggerOpsLoad(name){
+  if(_currentCustId){
     loadOpsData();
-    setTimeout(_redrawCharts,50);
-    _opsTimer=setInterval(loadOpsData,30000);
-  } else if(name==='purch'||name==='pay'||name==='prods'||name==='bonus'){
-    loadOpsData();
-    _opsTimer=setInterval(loadOpsData,30000);
+    if(!_opsTimer) _opsTimer=setInterval(loadOpsData,6000);
+  } else {
+    const _retry=setInterval(()=>{
+      if(_currentCustId){
+        clearInterval(_retry);
+        loadOpsData();
+        if(!_opsTimer) _opsTimer=setInterval(loadOpsData,6000);
+      }
+    },200);
   }
 }
 
@@ -451,11 +470,11 @@ function _refreshDisplay(){
   const retAsSales=fR.map(r=>({id:r.id,date:r.date||'',payment_type:'qaytarma',
     items_json:JSON.stringify([{name:r.product_name||'',qty:r.qty||0,sellPrice:r.price||0}]),
     total:r.total||0,paid:r.total||0,debt:0}));
-  const allPurch=[...fS,...retAsSales].sort((a,b)=>(b.date||'').localeCompare(a.date||''));
+  const _tsR=d=>{if(!d)return 0;const p=d.slice(0,16).replace('T',' ').split(/[-: ]/);if(p.length<3)return 0;return new Date(+p[0],+p[1]-1,+p[2],+(p[3]||0),+(p[4]||0),+(p[5]||0)).getTime();};
+  const allPurch=[...fS,...retAsSales].sort((a,b)=>_tsR(b.date)-_tsR(a.date));
   _renderStats(fS,fR);
-  _renderCharts(fS);
-  _renderPurchases(allPurch);
-  _renderPayments(fP);
+  try{_renderCharts(fS);}catch(e){}
+  _renderMelumat(allPurch,fP);
 }
 
 /* ── Stat kartları ───────────────────────── */
@@ -506,7 +525,8 @@ function _drawBar(data){
   if(emptyEl)emptyEl.style.display='none';
   canvas.style.display='block';
   const dpr=window.devicePixelRatio||1;
-  const W=canvas.parentElement.clientWidth-28||320;
+  const rawW=canvas.parentElement.offsetWidth||canvas.parentElement.clientWidth||0;
+  const W=rawW>50?rawW-28:320;
   const H=180;
   canvas.width=W*dpr; canvas.height=H*dpr;
   canvas.style.width=W+'px'; canvas.style.height=H+'px';
@@ -600,61 +620,166 @@ function _drawPie(data){
 function _renderCharts(sales){ const data=_buildChartData(sales); _drawBar(data); _drawPie(data); }
 function _redrawCharts(){ _renderCharts(_currentSales.filter(s=>_dateInFilter(s.date))); }
 
-/* ── Alışlar ─────────────────────────────── */
-function _renderPurchases(sales){
-  const el=document.getElementById('purchList');
+/* ── Məlumatlar (Alışlar + Ödənişlər birləşik) ────── */
+function _renderMelumat(allPurch,pmts){
+  const el=document.getElementById('melumatList');
   if(!el) return;
-  if(!sales||!sales.length){el.innerHTML='<div class="empty">Bu dövr üçün alış yoxdur</div>';return;}
+  const months=['','yanvar','fevral','mart','aprel','may','iyun','iyul','avqust','sentyabr','oktyabr','noyabr','dekabr'];
+  const _ts=d=>{if(!d)return 0;const p=d.slice(0,16).replace('T',' ').split(/[-: ]/);if(p.length<3)return 0;return new Date(+p[0],+p[1]-1,+p[2],+(p[3]||0),+(p[4]||0),+(p[5]||0)).getTime();};
+  const salesItems=(allPurch||[]).map(s=>({...s,_kind:'sale'}));
+  const pmtItems=(pmts||[]).map(p=>({...p,_kind:_bonusPmtIds.has(String(p.id))?'bonus':'payment'}));
+  const all=[...salesItems,...pmtItems].sort((a,b)=>_ts(b.date)-_ts(a.date));
+  _renderedSales=all;
+  if(!all.length){el.innerHTML='<div class="empty">Məlumat yoxdur</div>';return;}
   const FATURA_LABEL={nagd:'Satış faturası',nisye:'Satış faturası',qismen:'Satış faturası',evaz:'Əvəzetmə faturası',qaytarma:'İadə faturası'};
-  el.innerHTML=sales.map((s,i)=>{
-    const pt=s.payment_type||'nisye';
+  const html=all.map((item,i)=>{
+    const d=item.date||'';
+    const rawDate=d.slice(0,10);
+    const[y,m,dn]=rawDate.split('-');
+    const dateStr=dn&&m&&y?`${parseInt(dn)} ${months[parseInt(m)||0]||''} ${y}`:rawDate;
+    const timeStr=d.length>=16?' · '+d.slice(11,16):'';
+    const isLast=i===all.length-1;
+    const border=isLast?'':'border-bottom:1px solid #f1f5f9';
+    if(item._kind==='payment'){
+      const amt=(item.amount||0).toFixed(2);
+      return `<div onclick="showSaleDetail(${i})" style="display:flex;justify-content:space-between;align-items:flex-start;padding:16px 14px;${border};cursor:pointer;-webkit-tap-highlight-color:rgba(22,163,74,0.08)">
+        <div style="flex:1;min-width:0">
+          <div style="font-size:15px;font-weight:700;color:#1e293b;margin-bottom:5px">Ödəniş</div>
+          <div style="font-size:12px;color:#94a3b8">${dateStr}${timeStr}</div>
+          ${item.note?`<div style="font-size:12px;color:#64748b;margin-top:3px">${item.note}</div>`:''}
+        </div>
+        <div style="text-align:right;flex-shrink:0;margin-left:12px">
+          <div style="font-size:16px;font-weight:800;color:#16a34a;margin-bottom:6px">+${amt} ₼</div>
+          <div style="font-size:11px;color:#16a34a">Detaya bax →</div>
+        </div>
+      </div>`;
+    }
+    if(item._kind==='bonus'){
+      const amt=Math.abs(item.amount||0).toFixed(2);
+      const isEarned=item.type==='earned'||item.type==='qazanildi'||(!item.type&&(item.amount||0)>0);
+      const clr=isEarned?'#16a34a':'#dc2626';
+      const sign=isEarned?'+':'−';
+      const label=isEarned?'Bonus qazanıldı':'Bonus istifadə edildi';
+      return `<div onclick="showSaleDetail(${i})" style="display:flex;justify-content:space-between;align-items:flex-start;padding:16px 14px;${border};cursor:pointer;-webkit-tap-highlight-color:rgba(234,179,8,0.1)">
+        <div style="flex:1;min-width:0">
+          <div style="font-size:15px;font-weight:700;color:#1e293b;margin-bottom:5px">${label}</div>
+          <div style="font-size:12px;color:#94a3b8">${dateStr}${timeStr}</div>
+          ${item.note?`<div style="font-size:12px;color:#64748b;margin-top:3px">${item.note}</div>`:''}
+        </div>
+        <div style="text-align:right;flex-shrink:0;margin-left:12px">
+          <div style="font-size:16px;font-weight:800;color:${clr};margin-bottom:6px">${sign}${amt} ₼</div>
+          <div style="font-size:11px;color:#f59e0b">⭐ Bonus</div>
+        </div>
+      </div>`;
+    }
+    const pt=item.payment_type||'nisye';
     const isRet=pt==='qaytarma';
-    const total=(s.total||0).toFixed(2);
-    const rawDate=(s.date||'').slice(0,10);
-    const [y,m,d]=rawDate.split('-');
-    const months=['','yanvar','fevral','mart','aprel','may','iyun','iyul','avqust','sentyabr','oktyabr','noyabr','dekabr'];
-    const dateStr=d&&m&&y?`${parseInt(d)} ${months[parseInt(m)||0]||''} ${y}`:(s.date||'').slice(0,10);
-    const saleId=(s.id||'—').toString().toUpperCase();
-    const isLast=i===sales.length-1;
-    return `<div style="display:flex;justify-content:space-between;align-items:flex-start;padding:16px 0;${isLast?'':'border-bottom:1px solid #f1f5f9'}">
+    const isEvaz=pt==='evaz';
+    const total=(item.total||0).toFixed(2);
+    const saleId=(item.id||'—').toString().toUpperCase();
+    return `<div onclick="showSaleDetail(${i})" style="display:flex;justify-content:space-between;align-items:flex-start;padding:16px 14px;${border};cursor:pointer;-webkit-tap-highlight-color:rgba(99,102,241,0.08)">
       <div style="flex:1;min-width:0">
         <div style="font-size:15px;font-weight:700;color:#1e293b;margin-bottom:5px">${FATURA_LABEL[pt]||'Satış faturası'}</div>
-        <div style="font-size:13px;font-weight:600;color:#6366f1;margin-bottom:4px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${saleId}</div>
-        <div style="font-size:12px;color:#94a3b8">${dateStr}</div>
+        <div style="font-size:13px;font-weight:600;color:#7c3aed;margin-bottom:4px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${saleId}</div>
+        <div style="font-size:12px;color:#94a3b8">${dateStr}${timeStr}</div>
       </div>
       <div style="text-align:right;flex-shrink:0;margin-left:12px">
-        <div style="font-size:16px;font-weight:800;color:${isRet?'#0f766e':'#d97706'};margin-bottom:4px">${isRet?'-':''}${total} AZN</div>
-        <div style="font-size:12px;color:#94a3b8;margin-bottom:3px">+0.0 Bonus</div>
-        <div style="font-size:11px;color:#94a3b8">📋 Müştəri qeydi</div>
+        ${isEvaz?'':`<div style="font-size:16px;font-weight:800;color:${isRet?'#0f766e':'#d97706'};margin-bottom:6px">${isRet?'-':''}${total} ₼</div>`}
+        <div style="font-size:11px;color:#7c3aed">Detaya bax →</div>
       </div>
     </div>`;
   }).join('');
+  el.innerHTML=`<div style="background:#fff;border-radius:16px;margin:0 16px 16px;box-shadow:0 1px 4px rgba(0,0,0,.06);overflow:hidden">${html}</div>`;
 }
 
-/* ── Ödənişlər ───────────────────────────── */
-function _renderPayments(pmts){
-  const el=document.getElementById('payList');
-  if(!el) return;
-  if(!pmts||!pmts.length){el.innerHTML='<div class="empty">Bu dövr üçün ödəniş yoxdur</div>';return;}
-  const sorted=[...pmts].sort((a,b)=>{
-    const da=(a.date||''), db2=(b.date||'');
-    if(da!==db2) return db2.localeCompare(da);
-    return (b.id||'').localeCompare(a.id||'');
-  });
-  el.innerHTML=sorted.map(p=>{
-    const d=p.date||'';
-    const dateStr=d.slice(0,10);
-    const timeStr=d.length>=16?d.slice(11,16):'';
-    return `<div class="pay-card">
-      <div style="display:flex;justify-content:space-between;align-items:center">
-        <div><div style="font-size:13px;font-weight:700;color:#1e293b">Ödəniş</div>
-          <div style="font-size:12px;color:#94a3b8;margin-top:2px">${dateStr}${timeStr?' · '+timeStr:''}</div>
-          ${p.note?`<div style="font-size:12px;color:#64748b;margin-top:3px">${p.note}</div>`:''}
+function showSaleDetail(idx){
+  const s=_renderedSales[idx];
+  if(!s) return;
+  const months=['','yanvar','fevral','mart','aprel','may','iyun','iyul','avqust','sentyabr','oktyabr','noyabr','dekabr'];
+  if(s._kind==='payment'||s._kind==='bonus'){
+    const d=s.date||'';
+    const rawDate=d.slice(0,10);
+    const[y,m,dn]=rawDate.split('-');
+    const dateStr=dn&&m&&y?`${parseInt(dn)} ${months[parseInt(m)||0]||''} ${y}`:rawDate;
+    const timeStr=d.length>=16?' · '+d.slice(11,16):'';
+    const amt=Math.abs(s.amount||0).toFixed(2);
+    const isBonus=s._kind==='bonus';
+    const isEarned=isBonus&&(s.type==='earned'||s.type==='qazanildi'||(!s.type&&(s.amount||0)>0));
+    const title=isBonus?(isEarned?'Bonus qazanıldı':'Bonus istifadə edildi'):'Ödəniş';
+    const clr=isBonus?(isEarned?'#16a34a':'#dc2626'):'#16a34a';
+    const sign=isBonus?(isEarned?'+':'−'):'+';
+    const badge=isBonus?`<span style="background:#fef9c3;color:#a16207;border-radius:6px;padding:2px 8px;font-size:11px;font-weight:700">⭐ Bonus</span>`:`<span style="background:#dcfce7;color:#15803d;border-radius:6px;padding:2px 8px;font-size:11px;font-weight:700">Ödənildi</span>`;
+    document.getElementById('sdTitle').textContent=title;
+    document.getElementById('sdMeta').innerHTML=`<span style="color:${clr};font-weight:700">${sign}${amt} ₼</span> &nbsp;${badge}<br>${dateStr}${timeStr}`;
+    document.getElementById('sdItems').innerHTML=s.note?`<div style="padding:16px 0;font-size:14px;color:#64748b">${s.note}</div>`:'<div style="color:#94a3b8;text-align:center;padding:20px 0">Qeyd yoxdur</div>';
+    document.getElementById('sdFooter').innerHTML=`<div style="display:flex;justify-content:space-between;align-items:center"><span style="font-size:15px;font-weight:700;color:#1e293b">${title}</span><span style="font-size:18px;font-weight:800;color:${clr}">${sign}${amt} ₼</span></div>`;
+    document.getElementById('saleDetailBackdrop').style.display='block';
+    document.getElementById('saleDetailSheet').style.display='block';
+    return;
+  }
+  const FATURA_LABEL={nagd:'Satış faturası',nisye:'Satış faturası',qismen:'Satış faturası',evaz:'Əvəzetmə faturası',qaytarma:'İadə faturası'};
+  const PAY_BADGE={
+    nagd:'<span style="background:#dcfce7;color:#16a34a;border-radius:6px;padding:2px 8px;font-size:11px;font-weight:700">Nağd</span>',
+    nisye:'<span style="background:#fee2e2;color:#dc2626;border-radius:6px;padding:2px 8px;font-size:11px;font-weight:700">Nisyə</span>',
+    qismen:'<span style="background:#fef3c7;color:#d97706;border-radius:6px;padding:2px 8px;font-size:11px;font-weight:700">Qismən</span>',
+    evaz:'<span style="background:#ede9fe;color:#7c3aed;border-radius:6px;padding:2px 8px;font-size:11px;font-weight:700">Əvəzetmə</span>',
+    qaytarma:'<span style="background:#ecfdf5;color:#0f766e;border-radius:6px;padding:2px 8px;font-size:11px;font-weight:700">İadə</span>'
+  };
+  const pt=s.payment_type||'nisye';
+  const saleId=(s.id||'—').toString().toUpperCase();
+  const rawDate=(s.date||'').slice(0,10);
+  const[y,m,d]=rawDate.split('-');
+  const dateStr=d&&m&&y?`${parseInt(d)} ${months[parseInt(m)||0]||''} ${y}`:rawDate;
+  const timeStr=(s.date||'').length>=16?' · '+s.date.slice(11,16):'';
+  document.getElementById('sdTitle').textContent=FATURA_LABEL[pt]||'Satış faturası';
+  document.getElementById('sdMeta').innerHTML=`<span style="color:#7c3aed;font-weight:700">${saleId}</span><br>${dateStr}${timeStr} &nbsp;${PAY_BADGE[pt]||''}`;
+  const items=(()=>{try{return JSON.parse(s.items_json||'[]');}catch{return [];}})();
+  let calcTotal=0;
+  document.getElementById('sdItems').innerHTML=items.length?items.map(it=>{
+    const price=it.sellPrice!==undefined?it.sellPrice:(it.price||0);
+    const qty=it.qty||0;
+    const cemi=qty*price;
+    if(pt!=='evaz') calcTotal+=cemi;
+    const qtyStr=qty%1===0?String(qty):qty.toFixed(3);
+    if(pt==='evaz'){
+      return `<div style="display:flex;align-items:center;padding:11px 0;border-bottom:1px solid #f8fafc">
+        <div style="flex:1;min-width:0">
+          <div style="font-size:14px;font-weight:600;color:#1e293b">${it.name||'—'}</div>
+          <div style="font-size:12px;color:#94a3b8;margin-top:2px">${qtyStr} ədəd</div>
         </div>
-        <div style="font-size:16px;font-weight:800;color:#16a34a">+${(p.amount||0).toFixed(2)} ₼</div>
-      </div></div>`;
-  }).join('');
+      </div>`;
+    }
+    return `<div style="display:flex;justify-content:space-between;align-items:center;padding:11px 0;border-bottom:1px solid #f8fafc">
+      <div style="flex:1;min-width:0;padding-right:10px">
+        <div style="font-size:14px;font-weight:600;color:#1e293b">${it.name||'—'}</div>
+        <div style="font-size:12px;color:#94a3b8;margin-top:2px">${qtyStr} ədəd &times; ${price.toFixed(2)} ₼</div>
+      </div>
+      <div style="font-size:14px;font-weight:700;color:#7c3aed;flex-shrink:0">${cemi.toFixed(2)} ₼</div>
+    </div>`;
+  }).join(''):'<div style="color:#94a3b8;text-align:center;padding:20px 0">Məhsul məlumatı yoxdur</div>';
+  const displayTotal=(s.total||calcTotal);
+  const paid=s.paid||0;
+  let footer='';
+  if(pt!=='evaz'){
+    footer=`<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px">
+      <span style="font-size:15px;font-weight:700;color:#1e293b">Cəmi məbləğ</span>
+      <span style="font-size:18px;font-weight:800;color:#d97706">${displayTotal.toFixed(2)} ₼</span>
+    </div>
+    <div style="display:flex;justify-content:space-between;font-size:13px;margin-bottom:4px">
+      <span style="color:#64748b">Ödənildi</span><span style="color:#16a34a;font-weight:700">${paid.toFixed(2)} ₼</span>
+    </div>`;
+  }
+  document.getElementById('sdFooter').innerHTML=footer;
+  document.getElementById('saleDetailBackdrop').style.display='block';
+  document.getElementById('saleDetailSheet').style.display='block';
 }
+
+function closeSaleDetail(){
+  document.getElementById('saleDetailBackdrop').style.display='none';
+  document.getElementById('saleDetailSheet').style.display='none';
+}
+
+/* _renderPayments artıq istifadə edilmir — _renderMelumat birləşdirib */
 
 /* ── Məhsullar ───────────────────────────── */
 function renderProds(list){
@@ -729,13 +854,15 @@ async function loadProdsData(){
   const btn=document.getElementById('refreshBtn');
   if(btn) btn.textContent='↻ ...';
   try{
-    const [custArr,settingsRows,bonusRows,hiddenRows]=await Promise.all([
+    const [custArr,settingsRows,bonusRows,hiddenRows,bonusPmtRows]=await Promise.all([
       _sbGet('customers?id=eq.'+encodeURIComponent(_currentCustId)+'&limit=1'),
       _sbGet('app_settings?key=eq.show&limit=1'),
       _sbGet('app_settings?key=eq.customer_bonuses&limit=1'),
-      _sbGet('app_settings?key=eq.apkHiddenProducts&limit=1')
+      _sbGet('app_settings?key=eq.apkHiddenProducts&limit=1'),
+      _sbGet('app_settings?key=eq.bonus_pmt_ids&limit=1')
     ]);
     _apkHidden=new Set(hiddenRows&&hiddenRows[0]?JSON.parse(hiddenRows[0].value||'[]'):[]);
+    _bonusPmtIds=new Set(bonusPmtRows&&bonusPmtRows[0]?JSON.parse(bonusPmtRows[0].value||'[]'):[]);
     const cust=custArr&&custArr[0]; if(!cust) return;
     if(settingsRows&&settingsRows.length){
       const sv=(settingsRows[0].value||'').split(',').map(x=>x.trim());
@@ -752,7 +879,8 @@ async function loadProdsData(){
     if(pd){pd.textContent=debt.toFixed(2)+' ₼';pd.style.color=debt>0?'#b91c1c':'#16a34a';}
 
     const _bonusMap=bonusRows&&bonusRows[0]?JSON.parse(bonusRows[0].value||'{}'):{};
-    const _bonus=_bonusMap[_currentCustId]||0;
+    const _bonusRaw=_bonusMap[_currentCustId]||0;
+    const _bonus=typeof _bonusRaw==='object'?(_bonusRaw.amount||0):Number(_bonusRaw)||0;
     const bonusVal=document.getElementById('bonusVal');
     if(bonusVal)bonusVal.textContent=_bonus.toFixed(2)+' ₼';
     const bonusCard=document.getElementById('bonusCard');
@@ -776,31 +904,69 @@ async function loadProdsData(){
     if(pb)pb.textContent=_bonus.toFixed(2)+' ₼';
     if(pbRow)pbRow.style.display=_bonus>0?'':'none';
 
-    document.getElementById('tabBtn-purch').style.display=CAN.purchases?'':'none';
-    document.getElementById('tabBtn-pay').style.display=CAN.payments?'':'none';
+    document.getElementById('tabBtn-melumat').style.display=(CAN.purchases||CAN.payments)?'':'none';
   }catch(e){}
   if(btn) btn.textContent='↻ Yenilə';
 }
 
 async function loadOpsData(){
   if(!_currentCustId||!SB_URL||!SB_KEY) return;
+  if(!_opsLoaded){const mel=document.getElementById('melumatList');if(mel)mel.innerHTML='<div class="empty" style="color:#94a3b8">Yüklənir...</div>';}
   try{
     const [sales,pmts,rets]=await Promise.all([
-      _sbGet('sales?customer_id=eq.'+encodeURIComponent(_currentCustId)+'&order=date.desc'),
-      _sbGet('payments?customer_id=eq.'+encodeURIComponent(_currentCustId)+'&order=date.desc'),
-      _sbGet('returns?customer_id=eq.'+encodeURIComponent(_currentCustId)+'&order=date.desc')
+      _sbGet('sales?customer_id=eq.'+encodeURIComponent(_currentCustId)+'&order=date.desc&limit=200'),
+      _sbGet('payments?customer_id=eq.'+encodeURIComponent(_currentCustId)+'&order=date.desc&limit=200'),
+      _sbGet('returns?customer_id=eq.'+encodeURIComponent(_currentCustId)+'&order=date.desc&limit=200')
     ]);
     _currentSales=sales||[];_currentPmts=pmts||[];_currentRets=rets||[];
     _opsLoaded=true;
     _refreshDisplay();
     setTimeout(_redrawCharts,50);
-  }catch(e){}
+    _renderBonusFromPayments(_currentPmts);
+  }catch(e){
+    _opsLoaded=true;
+    _refreshDisplay();
+  }
+}
+
+function _renderBonusFromPayments(pmts){
+  const bonusPmts=(pmts||[]).filter(p=>_bonusPmtIds.has(String(p.id)));
+  const hist=bonusPmts.map(p=>({date:p.date,type:'used',amount:-(p.amount||0),note:p.note||'Bonus ödənişi'}));
+  _renderBonusHistory(hist);
+  _refreshDisplay();
+}
+
+function _renderBonusHistory(hist){
+  const el=document.getElementById('bonusHistList');
+  if(!el) return;
+  if(!hist||!hist.length){el.innerHTML='<div class="empty">Bonus tarixçəsi yoxdur</div>';return;}
+  const months=['','yanvar','fevral','mart','aprel','may','iyun','iyul','avqust','sentyabr','oktyabr','noyabr','dekabr'];
+  el.innerHTML=hist.map(h=>{
+    const rawDate=(h.date||'').slice(0,10);
+    const[y,m,d]=rawDate.split('-');
+    const dateStr=d&&m&&y?`${parseInt(d)} ${months[parseInt(m)||0]||''} ${y}`:rawDate;
+    const timeStr=(h.date||'').length>=16?' · '+h.date.slice(11,16):'';
+    const isEarned=h.type==='earned'||h.type==='qazanildi'||(!h.type&&(h.amount||0)>0);
+    const badgeBg=isEarned?'#dcfce7':'#fee2e2';
+    const badgeColor=isEarned?'#15803d':'#b91c1c';
+    const badgeText=isEarned?'Qazanıldı':'İstifadə edildi';
+    const amtColor=isEarned?'#16a34a':'#dc2626';
+    const amtPrefix=isEarned?'+':'-';
+    const amt=Math.abs(h.amount||0);
+    return `<div class="pay-card">
+      <div style="display:flex;justify-content:space-between;align-items:center">
+        <div>
+          <div style="margin-bottom:4px"><span style="background:${badgeBg};color:${badgeColor};border-radius:6px;padding:2px 8px;font-size:11px;font-weight:700">${badgeText}</span></div>
+          <div style="font-size:12px;color:#94a3b8">${dateStr}${timeStr}${h.note?` · ${h.note}`:''}</div>
+        </div>
+        <div style="font-size:16px;font-weight:800;color:${amtColor}">${amtPrefix}${amt.toFixed(2)} ₼</div>
+      </div>
+    </div>`;
+  }).join('');
 }
 
 async function refreshData(){
-  await loadProdsData();
-  const activePanel=document.querySelector('.tab-panel.active');
-  if(activePanel&&activePanel.id==='tab-ops') await loadOpsData();
+  await Promise.all([loadProdsData(), loadOpsData()]);
 }
 
 /* ── Visibility: arxa fondada dayanır ───── */
@@ -809,7 +975,9 @@ function _setupTimers(){
   _visHandler=()=>{
     if(document.visibilityState==='visible'&&_currentCustId){
       loadProdsData();
-      if(!_refreshTimer) _refreshTimer=setInterval(loadProdsData,20000);
+      if(!_refreshTimer) _refreshTimer=setInterval(loadProdsData,6000);
+      loadOpsData();
+      if(!_opsTimer) _opsTimer=setInterval(loadOpsData,6000);
     } else if(document.visibilityState==='hidden'){
       if(_refreshTimer){clearInterval(_refreshTimer);_refreshTimer=null;}
       if(_opsTimer){clearInterval(_opsTimer);_opsTimer=null;}
@@ -817,7 +985,10 @@ function _setupTimers(){
   };
   document.addEventListener('visibilitychange',_visHandler);
   if(_refreshTimer) clearInterval(_refreshTimer);
-  _refreshTimer=setInterval(loadProdsData,20000);
+  _refreshTimer=setInterval(loadProdsData,6000);
+  if(_opsTimer) clearInterval(_opsTimer);
+  _opsTimer=setInterval(loadOpsData,6000);
+  loadOpsData();
 }
 
 /* ── Login ───────────────────────────────── */
@@ -850,7 +1021,8 @@ async function _autoLogin(email){
     if(!custs||!custs.length){localStorage.removeItem('azela_user_email');document.getElementById('screenApp').style.display='none';document.getElementById('screenLogin').style.display='flex';return;}
     const cust=custs[0];_currentEmail=email;_currentCustId=cust.id;
     _setCustUI(cust,email);
-    await loadProdsData();
+    await Promise.all([loadProdsData(), loadOpsData()]);
+    if(!_opsTimer) _opsTimer=setInterval(loadOpsData,6000);
     sbHeartbeat(email);
     if(_heartbeatTimer) clearInterval(_heartbeatTimer);
     _heartbeatTimer=setInterval(()=>sbHeartbeat(_currentEmail),5*60*1000);
@@ -872,7 +1044,8 @@ async function doLogin(){
     _setCustUI(cust,email);
     document.getElementById('screenLogin').style.display='none';
     document.getElementById('screenApp').style.display='flex';
-    await loadProdsData();
+    await Promise.all([loadProdsData(), loadOpsData()]);
+    if(!_opsTimer) _opsTimer=setInterval(loadOpsData,6000);
     sbHeartbeat(email);
     if(_heartbeatTimer) clearInterval(_heartbeatTimer);
     _heartbeatTimer=setInterval(()=>sbHeartbeat(_currentEmail),5*60*1000);
