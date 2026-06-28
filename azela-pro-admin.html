@@ -2422,11 +2422,15 @@ th.sort-active{background:#dbeafe !important;color:#2563eb;}
         <div id="p15-s11" style="display:none">
           <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:16px;padding-bottom:12px;border-bottom:1.5px solid #000;gap:8px;flex-wrap:wrap">
             <span style="font-size:15px;font-weight:800">📲 Go APK Bildirişləri</span>
-            <div style="display:flex;gap:8px">
+            <div style="display:flex;gap:8px;align-items:center">
+              <div style="display:flex;border:1.5px solid #e2e8f0;border-radius:8px;overflow:hidden">
+                <button id="goPayAutoBtn" onclick="setGoPayMode(false)" style="padding:5px 12px;border:none;cursor:pointer;font-family:inherit;font-size:12px;font-weight:700;transition:all .15s">Avtomatik</button>
+                <button id="goPayManualBtn" onclick="setGoPayMode(true)" style="padding:5px 12px;border:none;cursor:pointer;font-family:inherit;font-size:12px;font-weight:700;transition:all .15s">Manual</button>
+              </div>
               <button id="goPayRefreshBtn" onclick="(async()=>{const b=document.getElementById('goPayRefreshBtn');b.disabled=true;b.textContent='...';try{await pollGoPayments();}finally{b.disabled=false;b.textContent='↺ Yenilə';}})()" style="padding:5px 12px;background:#16a34a;color:#fff;border:none;border-radius:8px;font-size:12px;font-weight:700;cursor:pointer;font-family:inherit">↺ Yenilə</button>
             </div>
           </div>
-          <div style="font-size:12px;color:#64748b;margin-bottom:12px">Müştərilər Go APK-dan ödəniş göndərdikdə burada görünür. "Qəbul et" basanda ödəniş sistemə yazılır.</div>
+          <div id="goPayModeDesc" style="font-size:12px;color:#64748b;margin-bottom:12px"></div>
           <div id="goPayList" style="max-width:520px"><div style="font-size:13px;color:#94a3b8;padding:20px 0;text-align:center">Yüklənir...</div></div>
         </div>
 
@@ -3691,7 +3695,7 @@ th.sort-active{background:#dbeafe !important;color:#2563eb;}
       <button onclick="closeModal('bonusHistoryOverlay')" style="width:30px;height:30px;border-radius:7px;background:#f4f4f5;border:none;color:#52525b;cursor:pointer;font-size:18px;line-height:1" onmouseover="this.style.background='#fee2e2';this.style.color='#dc2626'" onmouseout="this.style.background='#f4f4f5';this.style.color='#52525b'">×</button>
     </div>
     <!-- Son 3 ay birbaşa -->
-    <div id="bhRecent" style="padding:16px 22px;border-bottom:1px solid #f4f4f5;flex-shrink:0">
+    <div id="bhRecent" style="padding:16px 22px;border-bottom:1px solid #f4f4f5;flex-shrink:0;max-height:35vh;overflow-y:auto">
       <div style="font-size:11px;font-weight:700;color:#a1a1aa;text-transform:uppercase;letter-spacing:.5px;margin-bottom:10px">Son 3 ay</div>
       <div id="bhRecentList"></div>
     </div>
@@ -5986,7 +5990,7 @@ function deleteProdFromModal(){
 }
 
 // ═══════════════════════ VERSION UPDATE ═══════════════════════
-let ADMIN_VERSION     = '4.6.62';
+let ADMIN_VERSION     = '4.6.67';
 const VERSION_CHECK_URL = 'https://azela-app.vercel.app/version-pro.json';
 // version-pro.json formatı:
 // { "version":"1.0.1", "download":"https://...azela-pro-admin.html", "notes":"Yeni xüsusiyyətlər..." }
@@ -14658,6 +14662,7 @@ function p15Show(id, el) {
   if (id === 's8')   _licRenderStatus();
   if (id === 's9')   s9Init();
   if (id === 's10')  s10Init();
+  if (id === 's11')  _updateGoPayModeUI();
 }
 
 // ══════════════════════ ŞƏXSI KABİNET ══════════════════════
@@ -19822,6 +19827,59 @@ async function sbLoadStatuses() {
 let _goPayments = [];
 
 let _goPayRunning = false;
+let _goPayReminderTimer = null;
+let _goPayKnownIds = new Set();
+
+function _playGoPaySound() {
+  try {
+    const ctx = new (window.AudioContext || window.webkitAudioContext)();
+    const freqs = [2637, 3520, 4400, 5274];
+    freqs.forEach((f, i) => {
+      const o = ctx.createOscillator();
+      const g = ctx.createGain();
+      o.type = 'triangle';
+      o.frequency.value = f;
+      g.gain.setValueAtTime(i === 0 ? 0.5 : 0.2, ctx.currentTime);
+      g.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 0.6 - i * 0.08);
+      o.connect(g); g.connect(ctx.destination);
+      o.start(ctx.currentTime);
+      o.stop(ctx.currentTime + 0.6);
+    });
+  } catch(_) {}
+}
+
+function setGoPayMode(isManual) {
+  loadDB();
+  if (!db.settings) db.settings = {};
+  db.settings.goPayManual = isManual;
+  saveDB();
+  _updateGoPayModeUI();
+  pollGoPayments().catch(() => {});
+}
+
+function _updateGoPayModeUI() {
+  loadDB();
+  const isManual = !!(db.settings && db.settings.goPayManual);
+  const autoBtn = document.getElementById('goPayAutoBtn');
+  const manualBtn = document.getElementById('goPayManualBtn');
+  const desc = document.getElementById('goPayModeDesc');
+  if (autoBtn) { autoBtn.style.background = isManual ? '#f8fafc' : '#1e293b'; autoBtn.style.color = isManual ? '#64748b' : '#fff'; }
+  if (manualBtn) { manualBtn.style.background = isManual ? '#1e293b' : '#f8fafc'; manualBtn.style.color = isManual ? '#fff' : '#64748b'; }
+  if (desc) desc.textContent = isManual ? 'Manual rejim: hər ödəniş təsdiqlənməni gözləyir.' : 'Avtomatik rejim: gələn ödənişlər dərhal tətbiq edilir.';
+}
+
+function _goPayApprove(i) {
+  const p = _goPayments[i];
+  if (!p) return;
+  approveGoPayment(p.id, p.customer_id, p.customer_name || '', p.amount || 0, p.note || '', p.date || '');
+}
+
+function _goPayReject(i) {
+  const p = _goPayments[i];
+  if (!p) return;
+  rejectGoPayment(p.id, p.customer_id);
+}
+
 async function pollGoPayments() {
   if (_goPayRunning) return;
   _goPayRunning = true;
@@ -19842,8 +19900,10 @@ async function pollGoPayments() {
     let all = [];
     if (data && data[0] && data[0].value) { try { all = JSON.parse(data[0].value) || []; } catch(_) {} }
     const pending = all.filter(p => p.status === 'pending');
-    if (pending.length > 0) {
-      loadDB();
+    loadDB();
+    const isManual = !!(db.settings && db.settings.goPayManual);
+    if (!isManual && pending.length > 0) {
+      // ── Avtomatik rejim ──
       const _newSbPmts = [];
       for (const p of pending) {
         const amt = +(p.amount || 0);
@@ -19860,7 +19920,6 @@ async function pollGoPayments() {
         };
         db.payments.push(_newPmt);
         _newSbPmts.push({ id: _newPmt.id, customer_id: p.customer_id, date: _newPmt.date, amount: amt, note: _newPmt.note });
-        // Satış borclarını azalt (ən köhnədən)
         let rem = amt;
         (db.sales || []).filter(s => s.customerId === p.customer_id && (s.debt || 0) > 0)
           .sort((a, b) => (a.date || '').localeCompare(b.date || ''))
@@ -19872,7 +19931,6 @@ async function pollGoPayments() {
             s.paidAmount = s.paid;
             rem = round2(rem - pay);
           });
-        // Müştəri balansını yenilə
         const cust = (db.customers || []).find(c => c.id === p.customer_id);
         if (cust) { cust.balance = (cust.balance || 0) + amt; sbPatchBalance(cust.id, cust.balance); }
         if (p.type === 'bonus' && cust) cust.bonus = Math.max(0, (cust.bonus || 0) - amt);
@@ -19886,7 +19944,6 @@ async function pollGoPayments() {
       const processedIds = new Set(pending.map(p => p.id));
       const _afterSync = await _goPayReadAll(s).catch(() => []);
       await _goPayUpdateSb(s, _afterSync.filter(p => !processedIds.has(p.id)));
-      // sbSync-dən sonra backup INSERT — sbSync payments-i qaçırdıbsa burda əlavə edilir
       if (_newSbPmts.length) {
         try {
           await fetch(s.sbUrl + '/rest/v1/payments', {
@@ -19897,11 +19954,30 @@ async function pollGoPayments() {
         } catch(_) {}
       }
       flash(pending.length + ' Go APK ödənişi avtomatik tətbiq edildi', 'ok');
+    } else if (isManual) {
+      // ── Manual rejim: yeni ödənişlər üçün səs çal ──
+      const newOnes = pending.filter(p => !_goPayKnownIds.has(p.id));
+      if (newOnes.length > 0) {
+        _playGoPaySound();
+        if (!_goPayReminderTimer) {
+          _goPayReminderTimer = setInterval(() => {
+            if (_goPayments && _goPayments.length > 0) _playGoPaySound();
+            else { clearInterval(_goPayReminderTimer); _goPayReminderTimer = null; }
+          }, 30 * 60 * 1000);
+        }
+      }
+      pending.forEach(p => _goPayKnownIds.add(p.id));
+      if (pending.length === 0 && _goPayReminderTimer) {
+        clearInterval(_goPayReminderTimer); _goPayReminderTimer = null; _goPayKnownIds.clear();
+      }
     }
     _goPayments = pending;
     _renderGoPayments();
     const badge = document.getElementById('goBadge');
-    if (badge) badge.style.display = 'none';
+    if (badge) {
+      if (isManual && pending.length > 0) { badge.textContent = pending.length; badge.style.display = ''; }
+      else badge.style.display = 'none';
+    }
   } catch(e) {
     if (listEl) listEl.innerHTML = '<div style="color:#dc2626;font-size:13px">Xəta: ' + e.message + '</div>';
   } finally {
@@ -19912,26 +19988,44 @@ async function pollGoPayments() {
 function _renderGoPayments() {
   const el = document.getElementById('goPayList');
   if (!el) return;
+  loadDB();
+  const isManual = !!(db.settings && db.settings.goPayManual);
   if (!_goPayments || !_goPayments.length) {
     el.innerHTML = '<div style="font-size:13px;color:#16a34a;padding:20px 0;text-align:center">✓ Gözləyən ödəniş yoxdur</div>';
     return;
   }
-  el.innerHTML = _goPayments.map(p => `
-    <div style="display:flex;justify-content:space-between;align-items:center;padding:10px 14px;background:rgba(22,163,74,0.08);border-radius:10px;margin-bottom:8px;border:1px solid rgba(22,163,74,0.2)">
-      <div>
-        <div style="font-size:13px;font-weight:700;color:#1e293b">${escHtml(p.customer_name||'?')}</div>
-        <div style="font-size:11px;color:#64748b">${p.date||''}</div>
-      </div>
-      <div style="font-size:14px;font-weight:800;color:#16a34a">✓ ${(+(p.amount||0)).toFixed(2)} ₼</div>
-    </div>`).join('');
+  if (!isManual) {
+    el.innerHTML = _goPayments.map(p => `
+      <div style="display:flex;justify-content:space-between;align-items:center;padding:10px 14px;background:rgba(22,163,74,0.08);border-radius:10px;margin-bottom:8px;border:1px solid rgba(22,163,74,0.2)">
+        <div>
+          <div style="font-size:13px;font-weight:700;color:#1e293b">${escHtml(p.customer_name||'?')}</div>
+          <div style="font-size:11px;color:#64748b">${p.date||''}</div>
+        </div>
+        <div style="font-size:14px;font-weight:800;color:#16a34a">✓ ${(+(p.amount||0)).toFixed(2)} ₼</div>
+      </div>`).join('');
+  } else {
+    el.innerHTML = _goPayments.map((p, i) => `
+      <div style="display:flex;justify-content:space-between;align-items:center;padding:12px 14px;background:#fff;border-radius:10px;margin-bottom:8px;border:2px solid #e2e8f0">
+        <div>
+          <div style="font-size:13px;font-weight:700;color:#1e293b">${escHtml(p.customer_name||'?')}</div>
+          <div style="font-size:14px;font-weight:800;color:#7c3aed;margin-top:3px">${(+(p.amount||0)).toFixed(2)} ₼</div>
+          <div style="font-size:11px;color:#94a3b8;margin-top:2px">${(p.date||'').slice(0,16)}</div>
+        </div>
+        <div style="display:flex;flex-direction:column;gap:6px;flex-shrink:0;margin-left:14px">
+          <button onclick="_goPayApprove(${i})" onpointerdown="this.style.transform='scale(.93)';this.style.opacity='.75'" onpointerup="this.style.transform='';this.style.opacity='1'" onpointerleave="this.style.transform='';this.style.opacity='1'" style="padding:7px 16px;background:#fff;color:#16a34a;border:2px solid #16a34a;border-radius:8px;font-size:12px;font-weight:700;cursor:pointer;font-family:inherit;transition:transform .1s,opacity .1s">Qəbul et</button>
+          <button onclick="_goPayReject(${i})" onpointerdown="this.style.transform='scale(.93)';this.style.opacity='.75'" onpointerup="this.style.transform='';this.style.opacity='1'" onpointerleave="this.style.transform='';this.style.opacity='1'" style="padding:7px 16px;background:#fff;color:#dc2626;border:2px solid #dc2626;border-radius:8px;font-size:12px;font-weight:700;cursor:pointer;font-family:inherit;transition:transform .1s,opacity .1s">İmtina et</button>
+        </div>
+      </div>`).join('');
+  }
 }
 
 async function _goPayUpdateSb(s, all) {
-  await fetch(s.sbUrl + '/rest/v1/app_settings?key=eq.go_payments_pending', {
+  const r = await fetch(s.sbUrl + '/rest/v1/app_settings?key=eq.go_payments_pending', {
     method: 'PATCH',
     headers: { apikey: s.sbKey, Authorization: 'Bearer ' + s.sbKey, 'Content-Type': 'application/json', Prefer: 'return=minimal' },
     body: JSON.stringify({ value: JSON.stringify(all) })
   });
+  if (!r.ok) throw new Error('go_payments_pending yenilənmədi: ' + r.status);
 }
 
 async function _goPayReadAll(s) {
@@ -19948,41 +20042,73 @@ async function approveGoPayment(id, customerId, customerName, amount, note, date
   const s = db.apkSettings || {};
   if (!s.sbUrl || !s.sbKey) { flash('Supabase bağlantısı yoxdur', 'error'); return; }
   try {
-    const pmt = {
-      id: 'gp_' + Date.now(), customerId, customerName, amount: +amount,
-      note: note || 'Go APK ödənişi', date: date ? (date.length > 10 ? date.slice(0,16) : date + 'T' + nowISO().slice(11,16)) : nowISO(), type: 'cash'
-    };
+    const amt = +amount;
+    const pmtId = 'gp_' + Date.now();
+    const pmtDate = date ? (date.length > 10 ? date.slice(0,16) : date + 'T' + nowISO().slice(11,16)) : nowISO();
+    const pmt = { id: pmtId, sbPayId: id, customerId, customerName, amount: amt, note: note || 'Go APK ödənişi', date: pmtDate, type: 'cash' };
     if (!db.payments) db.payments = [];
     db.payments.push(pmt);
+    // Satış borclarını azalt (ən köhnədən)
+    let rem = amt;
+    (db.sales || []).filter(sl => sl.customerId === customerId && (sl.debt || 0) > 0)
+      .sort((a, b) => (a.date || '').localeCompare(b.date || ''))
+      .forEach(sl => {
+        if (rem <= 0) return;
+        const pay = Math.min(rem, sl.debt || 0);
+        sl.debt = round2(Math.max(0, (sl.debt || 0) - pay));
+        sl.paid = round2((sl.paid || sl.paidAmount || 0) + pay);
+        sl.paidAmount = sl.paid;
+        rem = round2(rem - pay);
+      });
     const _approveCust = (db.customers || []).find(c => c.id === customerId);
-    if (_approveCust) { _approveCust.balance = (_approveCust.balance || 0) + (+amount); sbPatchBalance(_approveCust.id, _approveCust.balance); }
+    if (_approveCust) { _approveCust.balance = (_approveCust.balance || 0) + amt; sbPatchBalance(_approveCust.id, _approveCust.balance); }
     saveDB();
+    const _gpOv = document.getElementById('custDetailOverlay');
+    if (_gpOv && !_gpOv.classList.contains('hidden') && _cdCustId === customerId) openCustDetail(customerId);
+    renderP11();
     _sbDirty = true;
     const all = await _goPayReadAll(s);
     await _goPayUpdateSb(s, all.filter(p => p.id !== id));
     _goPayments = _goPayments.filter(p => p.id !== id);
     _renderGoPayments();
     const badge = document.getElementById('goBadge');
-    if (badge) { if (_goPayments.length) badge.textContent = _goPayments.length; else badge.style.display = 'none'; }
-    flash('Ödəniş qəbul edildi — ' + parseFloat(amount).toFixed(2) + ' ₼', 'ok');
-    sbSync().catch(()=>{});
+    if (badge) { if (_goPayments.length) { badge.textContent = _goPayments.length; badge.style.display = ''; } else badge.style.display = 'none'; }
+    flash('Ödəniş qəbul edildi — ' + amt.toFixed(2) + ' ₼', 'ok');
+    await sbSync().catch(() => {});
+    try {
+      await fetch(s.sbUrl + '/rest/v1/payments', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', 'apikey': s.sbKey, 'Authorization': 'Bearer ' + s.sbKey, 'Prefer': 'resolution=ignore-duplicates,return=minimal' },
+        body: JSON.stringify([{ id: pmtId, customer_id: customerId, date: pmtDate, amount: amt, note: pmt.note }])
+      });
+    } catch(_) {}
+    if (!_goPayments.length && _goPayReminderTimer) { clearInterval(_goPayReminderTimer); _goPayReminderTimer = null; _goPayKnownIds.clear(); }
   } catch(e) {
     flash('Xəta: ' + e.message, 'error');
   }
 }
 
-async function rejectGoPayment(id) {
+async function rejectGoPayment(id, customerId) {
   loadDB();
   const s = db.apkSettings || {};
   if (!s.sbUrl || !s.sbKey) { flash('Supabase bağlantısı yoxdur', 'error'); return; }
   try {
     const all = await _goPayReadAll(s);
-    await _goPayUpdateSb(s, all.filter(p => p.id !== id));
+    const cutoff = Date.now() - 3600000;
+    const updated = all
+      .map(p => p.id === id ? { ...p, status: 'rejected' } : p)
+      .filter(p => !(p.status === 'rejected' && p.date && new Date(p.date).getTime() < cutoff));
+    await _goPayUpdateSb(s, updated);
+    if (customerId) {
+      const rc = (db.customers || []).find(c => String(c.id) === String(customerId));
+      if (rc) sbPatchBalance(rc.id, rc.balance);
+    }
     _goPayments = _goPayments.filter(p => p.id !== id);
     _renderGoPayments();
     const badge = document.getElementById('goBadge');
-    if (badge) { if (_goPayments.length) badge.textContent = _goPayments.length; else badge.style.display = 'none'; }
+    if (badge) { if (_goPayments.length) { badge.textContent = _goPayments.length; badge.style.display = ''; } else badge.style.display = 'none'; }
     flash('Ödəniş rədd edildi', 'ok');
+    if (!_goPayments.length && _goPayReminderTimer) { clearInterval(_goPayReminderTimer); _goPayReminderTimer = null; _goPayKnownIds.clear(); }
   } catch(e) {
     flash('Xəta: ' + e.message, 'error');
   }
