@@ -1,1 +1,1 @@
-{"version":"5.0.3","download":"https://github.com/mamedovorxan1989-alt/azela-pro-releases/releases/download/v5.0.3/AZELAPro-Setup-5.0.3.exe","notes":"v5.0.3: Delta sync — sbSync() artıq yalnız son sync-dən sonrakı satış/ödəniş/qaytarmaları göndərir. Supabase bandwidth ~95% azaldı."}
+{"version":"5.1.4","download":"https://github.com/mamedovorxan1989-alt/azela-pro-releases/releases/download/v5.1.4/AZELAPro-Setup-5.1.4.exe","notes":"v5.1.4: Barkod cap duzeldildi - etiket olcusu indi duzgun cap edilir, ayarlar tetbiq olunur"}
